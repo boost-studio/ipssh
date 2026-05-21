@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: ipssh-${{ github.ref_name }}-windows-x64-installer
-          path: dist/ipssh-0.1.0-windows-x64-installer.exe
+          path: dist/ipssh-0.1.1-windows-x64-installer.exe
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -91,7 +91,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "${{ github.ref_name }}"
-          $assetPath = "dist\ipssh-0.1.0-windows-x64-installer.exe"
+          $assetPath = "dist\ipssh-0.1.1-windows-x64-installer.exe"
 
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {

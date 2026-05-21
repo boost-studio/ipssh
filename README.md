@@ -53,7 +53,7 @@ scp -V
 Run the installer:
 
 ```powershell
-.\ipssh-0.1.0-windows-x64-installer.exe
+.\ipssh-0.1.1-windows-x64-installer.exe
 ```
 
 Default install paths:
@@ -74,13 +74,13 @@ ipssh --help
 Install without modifying `PATH`:
 
 ```powershell
-.\ipssh-0.1.0-windows-x64-installer.exe --no-path
+.\ipssh-0.1.1-windows-x64-installer.exe --no-path
 ```
 
 Uninstall:
 
 ```powershell
-.\ipssh-0.1.0-windows-x64-installer.exe --uninstall
+.\ipssh-0.1.1-windows-x64-installer.exe --uninstall
 ```
 
 Uninstall removes the program and PATH entry. It leaves the user config file in place.
@@ -329,7 +329,7 @@ powershell -ExecutionPolicy Bypass -File packaging\windows\build-installer.ps1
 The installer is written to:
 
 ```text
-dist\ipssh-0.1.0-windows-x64-installer.exe
+dist\ipssh-0.1.1-windows-x64-installer.exe
 ```
 
 Run tests:

@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
-$Version = "0.1.0"
+$Version = "0.1.1"
 $DistDir = Join-Path $RepoRoot "dist"
 $InstallerManifest = Join-Path $PSScriptRoot "installer\Cargo.toml"
 $IpSshBinary = Join-Path $RepoRoot "target\release\ipssh.exe"
