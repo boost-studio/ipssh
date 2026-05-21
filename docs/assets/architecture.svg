@@ -1,136 +1,148 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
   <title id="title">ipssh architecture</title>
-  <desc id="desc">The user runs ipssh. ipssh calls native ssh.exe and scp.exe tools.</desc>
+  <desc id="desc">ipssh runs inside Windows Terminal, calls native ssh.exe and scp.exe, and connects to a remote SSH server.</desc>
   <defs>
-    <marker id="arrowDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#344054"/>
+    <marker id="arrowDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
     </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#08745F"/>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#047857"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
     </marker>
     <filter id="shadow" x="-8%" y="-10%" width="116%" height="125%">
-      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#101828" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/>
     </filter>
     <style>
-      .bg { fill: #f7f8fb; }
-      .panel { fill: #ffffff; stroke: #d0d5dd; stroke-width: 1.4; filter: url(#shadow); }
-      .container { fill: #f8fafc; stroke: #64748b; stroke-width: 1.8; }
-      .tools { fill: #f8fbff; stroke: #60a5fa; stroke-width: 1.6; }
-      .band { fill: #eef2f6; stroke: #cbd5e1; stroke-width: 1.2; }
-      .blue { fill: #eff8ff; stroke: #2e90fa; stroke-width: 1.7; }
-      .green { fill: #ecfdf3; stroke: #12b76a; stroke-width: 1.7; }
-      .amber { fill: #fff8e8; stroke: #f79009; stroke-width: 1.6; }
-      .note { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.1; }
-      .decision { fill: #f0fdf9; stroke: #0d9488; stroke-width: 1.6; }
-      .badge { fill: #344054; }
-      .title { fill: #101828; font: 700 28px "Segoe UI", Arial, sans-serif; }
-      .subtitle { fill: #475467; font: 400 16px "Segoe UI", Arial, sans-serif; }
-      .sectionTitle { fill: #101828; font: 700 18px "Segoe UI", Arial, sans-serif; }
-      .label { fill: #101828; font: 700 17px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
-      .small { fill: #475467; font: 400 14px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
-      .tiny { fill: #667085; font: 400 12px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
-      .badgeText { fill: #ffffff; font: 700 12px "Segoe UI", Arial, sans-serif; letter-spacing: .4px; text-anchor: middle; }
-      .darkLine { fill: none; stroke: #344054; stroke-width: 2.3; marker-end: url(#arrowDark); }
-      .darkReturn { fill: none; stroke: #98a2b3; stroke-width: 1.9; stroke-dasharray: 7 7; marker-end: url(#arrowDark); }
-      .greenLine { fill: none; stroke: #08745F; stroke-width: 2.5; marker-end: url(#arrowGreen); }
-      .mutedLine { fill: none; stroke: #98a2b3; stroke-width: 1.8; stroke-dasharray: 6 6; marker-end: url(#arrowDark); }
+      .bg { fill: #f6f8fb; }
+      .panel { fill: #ffffff; stroke: #d0d7e2; stroke-width: 1.3; filter: url(#shadow); }
+      .group { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; }
+      .ipssh { fill: #f8fafc; stroke: #475569; stroke-width: 1.8; }
+      .lane { fill: #eef4fa; stroke: #cbd5e1; stroke-width: 1.2; }
+      .nodeBlue { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.6; }
+      .nodeGreen { fill: #ecfdf5; stroke: #059669; stroke-width: 1.6; }
+      .nodeAmber { fill: #fff7ed; stroke: #f59e0b; stroke-width: 1.5; }
+      .nodeNeutral { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.2; }
+      .decision { fill: #f0fdfa; stroke: #0f766e; stroke-width: 1.5; }
+      .badgeDark { fill: #334155; }
+      .badgeGreen { fill: #047857; }
+      .title { fill: #0f172a; font: 700 28px "Segoe UI", Arial, sans-serif; }
+      .subtitle { fill: #475569; font: 400 15px "Segoe UI", Arial, sans-serif; }
+      .sectionTitle { fill: #0f172a; font: 700 17px "Segoe UI", Arial, sans-serif; }
+      .label { fill: #0f172a; font: 700 16px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .small { fill: #475569; font: 400 13px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .tiny { fill: #64748b; font: 400 11.5px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .badgeText { fill: #ffffff; font: 700 12px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .lineDark { fill: none; stroke: #334155; stroke-width: 2.1; marker-end: url(#arrowDark); }
+      .lineGreen { fill: none; stroke: #047857; stroke-width: 2.2; marker-end: url(#arrowGreen); }
+      .lineAmber { fill: none; stroke: #b45309; stroke-width: 1.9; stroke-dasharray: 6 6; marker-end: url(#arrowAmber); }
+      .lineMuted { fill: none; stroke: #94a3b8; stroke-width: 1.7; stroke-dasharray: 6 6; marker-end: url(#arrowDark); }
     </style>
   </defs>
 
   <rect class="bg" width="1280" height="760"/>
   <rect class="panel" x="36" y="30" width="1208" height="700" rx="18"/>
 
-  <text class="title" x="78" y="78">ipssh architecture</text>
-  <text class="subtitle" x="78" y="108">ipssh wraps native OpenSSH tools: ssh.exe owns the terminal session, scp.exe uploads images.</text>
+  <text class="title" x="76" y="78">ipssh architecture</text>
+  <text class="subtitle" x="76" y="106">image paste ssh: keep native SSH terminal behavior, only intercept image paste.</text>
 
-  <rect class="blue" x="72" y="176" width="198" height="64" rx="12"/>
-  <text class="label" x="171" y="213">User</text>
+  <rect class="nodeBlue" x="70" y="180" width="200" height="64" rx="12"/>
+  <text class="label" x="170" y="216">User</text>
 
-  <rect class="blue" x="72" y="286" width="198" height="72" rx="12"/>
-  <text class="label" x="171" y="318">Windows Terminal</text>
-  <text class="small" x="171" y="340">native paste target</text>
+  <rect class="nodeBlue" x="70" y="296" width="200" height="78" rx="12"/>
+  <text class="label" x="170" y="329">Windows Terminal</text>
+  <text class="small" x="170" y="351">native paste surface</text>
 
-  <rect class="container" x="318" y="138" width="620" height="538" rx="20"/>
-  <text class="sectionTitle" x="348" y="174">ipssh process</text>
-  <text class="subtitle" x="348" y="198">orchestrates native tools; does not implement SSH</text>
+  <rect class="ipssh" x="310" y="138" width="590" height="568" rx="20"/>
+  <text class="sectionTitle" x="342" y="174">ipssh process</text>
+  <text class="subtitle" x="342" y="198">orchestrates native tools; does not implement SSH</text>
 
-  <rect class="band" x="352" y="222" width="552" height="150" rx="16"/>
-  <rect class="badge" x="374" y="244" width="142" height="30" rx="15"/>
-  <text class="badgeText" x="445" y="264">terminal path</text>
+  <rect class="lane" x="342" y="224" width="526" height="138" rx="16"/>
+  <rect class="badgeDark" x="364" y="246" width="156" height="30" rx="15"/>
+  <text class="badgeText" x="442" y="265">terminal passthrough</text>
 
-  <rect class="blue" x="410" y="294" width="190" height="58" rx="11"/>
-  <text class="label" x="505" y="319">calls</text>
-  <text class="small" x="505" y="340">ssh.exe</text>
+  <rect class="nodeBlue" x="392" y="298" width="168" height="48" rx="10"/>
+  <text class="label" x="476" y="318">call ssh.exe</text>
+  <text class="tiny" x="476" y="336">stdin / stdout owned by ssh</text>
 
-  <rect class="note" x="624" y="286" width="238" height="74" rx="10"/>
-  <text class="tiny" x="743" y="309">Native terminal behavior</text>
-  <text class="tiny" x="743" y="327">stays intact: text paste,</text>
-  <text class="tiny" x="743" y="345">Ctrl+C, Ctrl+D, full-screen apps</text>
+  <rect class="nodeNeutral" x="628" y="288" width="208" height="64" rx="10"/>
+  <text class="tiny" x="732" y="310">Text paste, Ctrl+C, Ctrl+D,</text>
+  <text class="tiny" x="732" y="328">and full-screen apps pass</text>
+  <text class="tiny" x="732" y="346">through unchanged.</text>
 
-  <rect class="band" x="352" y="414" width="552" height="226" rx="16"/>
-  <rect class="badge" x="374" y="436" width="150" height="30" rx="15"/>
-  <text class="badgeText" x="449" y="456">image sidecar</text>
+  <rect class="lane" x="342" y="400" width="526" height="292" rx="16"/>
+  <rect class="badgeGreen" x="364" y="422" width="132" height="30" rx="15"/>
+  <text class="badgeText" x="430" y="441">image sidecar</text>
 
-  <rect class="green" x="388" y="496" width="142" height="70" rx="11"/>
-  <text class="label" x="459" y="524">Alt+V</text>
-  <text class="small" x="459" y="546">hotkey</text>
+  <rect class="nodeGreen" x="374" y="486" width="110" height="58" rx="10"/>
+  <text class="label" x="429" y="509">Alt+V</text>
+  <text class="small" x="429" y="529">hotkey</text>
 
-  <rect class="green" x="570" y="496" width="146" height="70" rx="11"/>
-  <text class="label" x="643" y="524">Clipboard</text>
-  <text class="small" x="643" y="546">image only</text>
+  <path class="decision" d="M 548 515 L 606 482 L 664 515 L 606 548 Z"/>
+  <text class="tiny" x="606" y="511">clipboard</text>
+  <text class="tiny" x="606" y="527">image?</text>
 
-  <rect class="green" x="756" y="496" width="126" height="70" rx="11"/>
-  <text class="label" x="819" y="524">Cache</text>
-  <text class="small" x="819" y="546">last image</text>
+  <rect class="nodeGreen" x="714" y="486" width="120" height="58" rx="10"/>
+  <text class="label" x="774" y="509">Cache</text>
+  <text class="small" x="774" y="529">last image</text>
 
-  <path class="decision" d="M 754 604 L 819 570 L 884 604 L 819 638 Z"/>
-  <text class="tiny" x="819" y="599">same</text>
-  <text class="tiny" x="819" y="615">image?</text>
+  <path class="decision" d="M 716 594 L 774 562 L 832 594 L 774 626 Z"/>
+  <text class="tiny" x="774" y="590">same</text>
+  <text class="tiny" x="774" y="606">image?</text>
 
-  <rect class="amber" x="488" y="590" width="210" height="42" rx="10"/>
-  <text class="small" x="593" y="608">non-image paste</text>
-  <text class="tiny" x="593" y="624">handled by terminal</text>
+  <rect class="nodeAmber" x="504" y="578" width="174" height="42" rx="10"/>
+  <text class="small" x="591" y="595">non-image paste</text>
+  <text class="tiny" x="591" y="611">handled by terminal</text>
 
-  <rect class="tools" x="986" y="138" width="226" height="538" rx="20"/>
-  <text class="sectionTitle" x="1016" y="174">native OpenSSH tools</text>
+  <rect class="nodeGreen" x="628" y="646" width="214" height="42" rx="10"/>
+  <text class="small" x="735" y="663">reuse cached remote path</text>
+  <text class="tiny" x="735" y="679">no duplicate scp upload</text>
 
-  <rect class="blue" x="1026" y="232" width="150" height="78" rx="11"/>
-  <text class="label" x="1101" y="264">ssh.exe</text>
-  <text class="small" x="1101" y="288">terminal I/O</text>
+  <rect class="group" x="938" y="138" width="162" height="568" rx="18"/>
+  <text class="sectionTitle" x="968" y="174">native tools</text>
+  <text class="tiny" x="1019" y="196">Windows OpenSSH</text>
 
-  <rect class="green" x="1026" y="480" width="150" height="78" rx="11"/>
-  <text class="label" x="1101" y="512">scp.exe</text>
-  <text class="small" x="1101" y="536">upload PNG</text>
+  <rect class="nodeBlue" x="962" y="248" width="114" height="64" rx="10"/>
+  <text class="label" x="1019" y="276">ssh.exe</text>
+  <text class="small" x="1019" y="296">terminal I/O</text>
 
-  <rect class="green" x="1026" y="584" width="150" height="56" rx="11"/>
-  <text class="small" x="1101" y="606">mkdir if needed</text>
-  <text class="tiny" x="1101" y="624">before upload</text>
+  <rect class="nodeGreen" x="962" y="504" width="114" height="78" rx="10"/>
+  <text class="label" x="1019" y="533">scp.exe</text>
+  <text class="small" x="1019" y="553">mkdir if needed</text>
+  <text class="tiny" x="1019" y="570">upload PNG</text>
 
-  <rect class="blue" x="1026" y="346" width="150" height="74" rx="11"/>
-  <text class="label" x="1101" y="378">SSH server</text>
-  <text class="small" x="1101" y="400">remote shell</text>
+  <rect class="nodeBlue" x="1130" y="324" width="90" height="96" rx="12"/>
+  <text class="label" x="1175" y="360">SSH</text>
+  <text class="label" x="1175" y="380">server</text>
+  <text class="tiny" x="1175" y="400">remote host</text>
 
-  <rect class="note" x="946" y="682" width="256" height="44" rx="10"/>
-  <text class="tiny" x="1074" y="701">Yes: reuse cached remote path</text>
-  <text class="tiny" x="1074" y="717">and paste it without scp.exe</text>
+  <path class="lineDark" d="M 170 244 L 170 296"/>
+  <text class="tiny" x="202" y="273">keyboard</text>
+  <path class="lineDark" d="M 270 335 L 310 335"/>
+  <text class="tiny" x="290" y="318">runs ipssh</text>
 
-  <path class="darkLine" d="M 171 240 L 171 286"/>
-  <text class="tiny" x="204" y="266">keyboard</text>
-  <path class="darkLine" d="M 270 322 L 318 322"/>
-  <text class="tiny" x="294" y="306">runs ipssh</text>
+  <path class="lineDark" d="M 560 306 C 690 246, 824 246, 962 280"/>
+  <text class="tiny" x="760" y="254">native terminal path</text>
+  <path class="lineDark" d="M 1076 280 C 1110 280, 1122 325, 1130 356"/>
+  <text class="tiny" x="1112" y="298">connects</text>
 
-  <path class="darkLine" d="M 600 323 L 986 271"/>
-  <path class="darkLine" d="M 1101 310 L 1101 346"/>
-  <path class="darkReturn" d="M 1026 400 C 948 438, 916 392, 862 360"/>
+  <path class="lineMuted" d="M 1130 390 C 1056 460, 952 386, 836 336"/>
+  <text class="tiny" x="993" y="432">remote shell I/O</text>
 
-  <path class="greenLine" d="M 530 531 L 570 531"/>
-  <path class="greenLine" d="M 716 531 L 756 531"/>
-  <path class="greenLine" d="M 819 566 L 819 570"/>
-  <path class="greenLine" d="M 884 604 C 928 570, 966 532, 1026 519"/>
-  <text class="tiny" x="952" y="554">No: upload</text>
-  <path class="greenLine" d="M 819 638 C 850 688, 894 704, 946 704"/>
-  <text class="tiny" x="890" y="684">Yes</text>
-  <path class="greenLine" d="M 1101 480 L 1101 420"/>
-  <path class="mutedLine" d="M 488 612 C 350 612, 210 466, 171 358"/>
-  <text class="tiny" x="318" y="548">native paste</text>
+  <path class="lineGreen" d="M 484 515 L 548 515"/>
+  <path class="lineGreen" d="M 664 515 L 714 515"/>
+  <text class="tiny" x="690" y="498">Yes</text>
+  <path class="lineAmber" d="M 578 540 L 578 578"/>
+  <text class="tiny" x="558" y="562">No</text>
+  <path class="lineAmber" d="M 504 599 C 370 598, 262 466, 170 374"/>
+
+  <path class="lineGreen" d="M 774 544 L 774 562"/>
+  <path class="lineGreen" d="M 832 594 C 880 594, 906 546, 962 543"/>
+  <text class="tiny" x="906" y="568">No: upload</text>
+  <path class="lineGreen" d="M 774 626 C 774 640, 756 642, 742 646"/>
+  <text class="tiny" x="798" y="642">Yes</text>
+  <path class="lineGreen" d="M 1076 543 C 1112 530, 1124 424, 1130 388"/>
+  <path class="lineGreen" d="M 1130 406 C 1040 650, 914 667, 842 667"/>
+  <text class="tiny" x="1036" y="652">remote file path</text>
 </svg>
