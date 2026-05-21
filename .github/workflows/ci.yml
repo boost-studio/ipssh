@@ -43,6 +43,8 @@ jobs:
     runs-on: windows-latest
     needs: test
     if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -82,3 +84,21 @@ jobs:
           name: ipssh-${{ github.ref_name }}-windows-x64-installer
           path: dist/ipssh-0.1.0-windows-x64-installer.exe
           if-no-files-found: error
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $assetPath = "dist\ipssh-0.1.0-windows-x64-installer.exe"
+
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $assetPath --clobber
+          } else {
+            gh release create $tag $assetPath `
+              --title "ipssh $tag" `
+              --generate-notes `
+              --verify-tag
+          }
