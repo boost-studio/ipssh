@@ -1,5 +1,7 @@
 # ipssh
 
+[简体中文](README.zh-CN.md)
+
 `ipssh` is short for image paste ssh. It is a Windows OpenSSH wrapper for pasting clipboard images into an SSH session.
 
 When working on a remote SSH server with AI coding tools such as Claude Code, Codex, and similar terminal-based assistants, pasting screenshots or other images is usually not supported. Some SSH clients also handle multiline text paste poorly and send it as multiple shell commands.
@@ -8,7 +10,7 @@ When working on a remote SSH server with AI coding tools such as Claude Code, Co
 
 `ipssh` does not implement the SSH protocol. It calls the `ssh.exe` and `scp.exe` command-line tools already installed on Windows. These are commonly available from the Windows OpenSSH optional feature or from the Windows Git installer.
 
-For design details, see [docs/design.md](docs/design.md).
+For design details, see [docs/design.md](docs/design.md). Chinese version: [README.zh-CN.md](README.zh-CN.md), [docs/design.zh-CN.md](docs/design.zh-CN.md).
 
 ## How It Works
 

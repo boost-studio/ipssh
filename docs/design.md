@@ -1,5 +1,7 @@
 # ipssh Design
 
+[简体中文](design.zh-CN.md)
+
 This document describes the final design of `ipssh`. Earlier design notes and implementation plans have been merged here and removed from the repository.
 
 ## Purpose
