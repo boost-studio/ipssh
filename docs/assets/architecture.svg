@@ -54,11 +54,11 @@
   <text class="label" x="170" y="329">Windows Terminal</text>
   <text class="small" x="170" y="351">native paste surface</text>
 
-  <rect class="ipssh" x="310" y="138" width="590" height="568" rx="20"/>
+  <rect class="ipssh" x="310" y="138" width="620" height="568" rx="20"/>
   <text class="sectionTitle" x="342" y="174">ipssh process</text>
   <text class="subtitle" x="342" y="198">orchestrates native tools; does not implement SSH</text>
 
-  <rect class="lane" x="342" y="224" width="526" height="138" rx="16"/>
+  <rect class="lane" x="342" y="224" width="556" height="138" rx="16"/>
   <rect class="badgeDark" x="364" y="246" width="156" height="30" rx="15"/>
   <text class="badgeText" x="442" y="265">terminal passthrough</text>
 
@@ -71,7 +71,7 @@
   <text class="tiny" x="732" y="328">and full-screen apps pass</text>
   <text class="tiny" x="732" y="346">through unchanged.</text>
 
-  <rect class="lane" x="342" y="400" width="548" height="292" rx="16"/>
+  <rect class="lane" x="342" y="400" width="556" height="292" rx="16"/>
   <rect class="badgeGreen" x="364" y="422" width="132" height="30" rx="15"/>
   <text class="badgeText" x="430" y="441">image sidecar</text>
 
@@ -87,48 +87,48 @@
   <text class="label" x="715" y="509">Cache</text>
   <text class="small" x="715" y="529">last image</text>
 
-  <path class="decision" d="M 786 515 L 838 486 L 890 515 L 838 544 Z"/>
-  <text class="tiny" x="838" y="511">same</text>
-  <text class="tiny" x="838" y="527">image?</text>
+  <path class="decision" d="M 812 515 L 864 486 L 916 515 L 864 544 Z"/>
+  <text class="tiny" x="864" y="511">same</text>
+  <text class="tiny" x="864" y="527">image?</text>
 
   <rect class="nodeAmber" x="504" y="578" width="174" height="42" rx="10"/>
   <text class="small" x="591" y="595">non-image paste</text>
   <text class="tiny" x="591" y="611">handled by terminal</text>
 
-  <rect class="nodeGreen" x="590" y="646" width="230" height="42" rx="10"/>
-  <text class="small" x="705" y="663">reuse cached remote path</text>
-  <text class="tiny" x="705" y="679">no duplicate scp upload</text>
+  <rect class="nodeGreen" x="626" y="646" width="230" height="42" rx="10"/>
+  <text class="small" x="741" y="663">reuse cached remote path</text>
+  <text class="tiny" x="741" y="679">no duplicate scp upload</text>
 
-  <rect class="group" x="938" y="138" width="162" height="568" rx="18"/>
-  <text class="sectionTitle" x="968" y="174">native tools</text>
-  <text class="tiny" x="1019" y="196">Windows OpenSSH</text>
+  <rect class="group" x="958" y="138" width="162" height="568" rx="18"/>
+  <text class="sectionTitle" x="988" y="174">native tools</text>
+  <text class="tiny" x="1039" y="196">Windows OpenSSH</text>
 
-  <rect class="nodeBlue" x="962" y="248" width="114" height="64" rx="10"/>
-  <text class="label" x="1019" y="276">ssh.exe</text>
-  <text class="small" x="1019" y="296">terminal I/O</text>
+  <rect class="nodeBlue" x="982" y="248" width="114" height="64" rx="10"/>
+  <text class="label" x="1039" y="276">ssh.exe</text>
+  <text class="small" x="1039" y="296">terminal I/O</text>
 
-  <rect class="nodeGreen" x="962" y="504" width="114" height="78" rx="10"/>
-  <text class="label" x="1019" y="533">scp.exe</text>
-  <text class="small" x="1019" y="553">mkdir if needed</text>
-  <text class="tiny" x="1019" y="570">upload PNG</text>
+  <rect class="nodeGreen" x="982" y="476" width="114" height="78" rx="10"/>
+  <text class="label" x="1039" y="505">scp.exe</text>
+  <text class="small" x="1039" y="525">mkdir if needed</text>
+  <text class="tiny" x="1039" y="542">upload PNG</text>
 
-  <rect class="nodeBlue" x="1130" y="324" width="90" height="96" rx="12"/>
-  <text class="label" x="1175" y="360">SSH</text>
-  <text class="label" x="1175" y="380">server</text>
-  <text class="tiny" x="1175" y="400">remote host</text>
+  <rect class="nodeBlue" x="1142" y="324" width="90" height="96" rx="12"/>
+  <text class="label" x="1187" y="360">SSH</text>
+  <text class="label" x="1187" y="380">server</text>
+  <text class="tiny" x="1187" y="400">remote host</text>
 
   <path class="lineDark" d="M 170 244 L 170 296"/>
   <text class="tiny" x="202" y="273">keyboard</text>
   <path class="lineDark" d="M 270 335 L 310 335"/>
   <text class="tiny" x="290" y="318">runs ipssh</text>
 
-  <path class="lineDark" d="M 560 306 C 690 246, 824 246, 962 280"/>
+  <path class="lineDark" d="M 560 306 C 696 246, 840 246, 982 280"/>
   <text class="tiny" x="760" y="254">native terminal path</text>
-  <path class="lineDark" d="M 1076 280 C 1110 280, 1122 325, 1130 356"/>
-  <text class="tiny" x="1112" y="298">connects</text>
+  <path class="lineDark" d="M 1096 280 C 1124 280, 1136 325, 1142 356"/>
+  <text class="tiny" x="1128" y="298">connects</text>
 
-  <path class="lineMuted" d="M 1130 390 C 1056 460, 952 386, 836 336"/>
-  <text class="tiny" x="993" y="432">remote shell I/O</text>
+  <path class="lineMuted" d="M 1142 390 C 1068 460, 960 386, 836 336"/>
+  <text class="tiny" x="1008" y="432">remote shell I/O</text>
 
   <path class="lineGreen" d="M 484 515 L 522 515"/>
   <path class="lineGreen" d="M 618 515 L 660 515"/>
@@ -137,12 +137,12 @@
   <text class="tiny" x="548" y="562">No</text>
   <path class="lineAmber" d="M 504 599 C 370 598, 262 466, 170 374"/>
 
-  <path class="lineGreen" d="M 770 515 L 786 515"/>
-  <path class="lineGreen" d="M 890 515 C 920 515, 934 543, 962 543"/>
-  <text class="tiny" x="926" y="526">No: upload</text>
-  <path class="lineGreen" d="M 838 544 C 820 592, 760 636, 705 646"/>
-  <text class="tiny" x="810" y="598">Yes</text>
-  <path class="lineGreen" d="M 1076 543 C 1112 530, 1124 424, 1130 388"/>
-  <path class="lineGreen" d="M 1175 420 C 1188 574, 1090 667, 820 667"/>
-  <text class="tiny" x="1032" y="690">remote file path</text>
+  <path class="lineGreen" d="M 770 515 L 812 515"/>
+  <path class="lineGreen" d="M 916 515 L 982 515"/>
+  <text class="tiny" x="950" y="499">No: upload</text>
+  <path class="lineGreen" d="M 864 544 C 846 594, 794 636, 741 646"/>
+  <text class="tiny" x="834" y="600">Yes</text>
+  <path class="lineGreen" d="M 1096 515 C 1128 506, 1138 420, 1142 388"/>
+  <path class="lineGreen" d="M 1187 420 C 1202 574, 1110 667, 856 667"/>
+  <text class="tiny" x="1048" y="690">remote file path</text>
 </svg>
