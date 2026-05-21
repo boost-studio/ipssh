@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 const APP_NAME: &str = "ipssh";
-const VERSION: &str = "0.1.1";
+const VERSION: &str = "0.1.2";
 const EXE_BYTES: &[u8] = include_bytes!(env!("IPSSH_BIN"));
 const DEFAULT_CONFIG: &str = include_str!("../../default-config.toml");
 

@@ -40,7 +40,7 @@ scp -V
 运行安装包：
 
 ```powershell
-.\ipssh-0.1.1-windows-x64-installer.exe
+.\ipssh-0.1.2-windows-x64-installer.exe
 ```
 
 默认安装路径：
@@ -59,13 +59,13 @@ ipssh --help
 不修改 `PATH`：
 
 ```powershell
-.\ipssh-0.1.1-windows-x64-installer.exe --no-path
+.\ipssh-0.1.2-windows-x64-installer.exe --no-path
 ```
 
 卸载：
 
 ```powershell
-.\ipssh-0.1.1-windows-x64-installer.exe --uninstall
+.\ipssh-0.1.2-windows-x64-installer.exe --uninstall
 ```
 
 卸载会移除程序和 PATH 项，但保留用户配置文件。

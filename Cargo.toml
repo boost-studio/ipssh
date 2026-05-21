@@ -1,6 +1,6 @@
 [package]
 name = "ipssh"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Windows OpenSSH wrapper that uploads pasted clipboard images and inserts remote paths"
 license = "MIT"
