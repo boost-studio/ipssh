@@ -120,13 +120,13 @@ ipssh -- user@example.com -p 2222 -i C:\Users\me\.ssh\id_ed25519
 默认远端目录：
 
 ```text
-~/Pictures/paste-ssh
+/tmp/ipssh-images
 ```
 
 默认插入文本是远端文件路径：
 
 ```text
-~/Pictures/paste-ssh/20260521-153012-a1b2c3.png
+/tmp/ipssh-images/20260521-153012-a1b2c3.png
 ```
 
 ## 文本粘贴
@@ -147,7 +147,7 @@ ipssh -- user@example.com -p 2222 -i C:\Users\me\.ssh\id_ed25519
 
 ```toml
 paste_hotkey = "alt+v"
-remote_dir = "~/Pictures/paste-ssh"
+remote_dir = "/tmp/ipssh-images"
 image_format = "png"
 non_image_paste = "text"
 template = "{remote_path}"

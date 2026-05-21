@@ -75,7 +75,7 @@ impl AppConfig {
         let remote_dir = overrides
             .remote_dir
             .or(raw.remote_dir)
-            .unwrap_or_else(|| "~/Pictures/paste-ssh".to_string());
+            .unwrap_or_else(|| "/tmp/ipssh-images".to_string());
         let image_format = overrides
             .image_format
             .or(raw.image_format)
@@ -118,7 +118,7 @@ mod tests {
     fn defaults_match_design_spec() {
         let cfg = AppConfig::load(None, ConfigOverrides::default()).unwrap();
         assert_eq!(cfg.paste_hotkey, "alt+v");
-        assert_eq!(cfg.remote_dir, "~/Pictures/paste-ssh");
+        assert_eq!(cfg.remote_dir, "/tmp/ipssh-images");
         assert_eq!(cfg.image_format, "png");
         assert_eq!(cfg.non_image_paste, NonImagePaste::Text);
         assert_eq!(cfg.template, "{remote_path}");

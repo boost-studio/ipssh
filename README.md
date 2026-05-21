@@ -124,13 +124,13 @@ If the clipboard image has not changed since the previous image paste in the sam
 The default remote directory is:
 
 ```text
-~/Pictures/paste-ssh
+/tmp/ipssh-images
 ```
 
 The default inserted text is the remote file path:
 
 ```text
-~/Pictures/paste-ssh/20260521-153012-a1b2c3.png
+/tmp/ipssh-images/20260521-153012-a1b2c3.png
 ```
 
 ## Text Paste
@@ -151,7 +151,7 @@ Example:
 
 ```toml
 paste_hotkey = "alt+v"
-remote_dir = "~/Pictures/paste-ssh"
+remote_dir = "/tmp/ipssh-images"
 image_format = "png"
 non_image_paste = "text"
 template = "{remote_path}"
@@ -264,7 +264,7 @@ Check these items:
 Try a plain command first:
 
 ```powershell
-scp .\some-image.png user@example.com:~/Pictures/paste-ssh/
+scp .\some-image.png user@example.com:/tmp/ipssh-images/
 ```
 
 ### Upload asks for a password every time

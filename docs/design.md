@@ -114,7 +114,7 @@ Default config:
 
 ```toml
 paste_hotkey = "alt+v"
-remote_dir = "~/Pictures/paste-ssh"
+remote_dir = "/tmp/ipssh-images"
 image_format = "png"
 non_image_paste = "text"
 template = "{remote_path}"

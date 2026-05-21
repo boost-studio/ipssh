@@ -530,7 +530,7 @@ mod tests {
             .unwrap()
             .unwrap();
 
-        assert!(path.starts_with("~/Pictures/paste-ssh/"));
+        assert!(path.starts_with("/tmp/ipssh-images/"));
         assert!(path.ends_with(".png"));
     }
 
