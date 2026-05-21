@@ -29,9 +29,31 @@ where
     C: ClipboardReader,
     R: CommandRunner,
 {
+    let mut cache = ClipboardImageUploadCache::default();
+    upload_clipboard_image_path_cached(config, invocation, clipboard, uploader, &mut cache)
+}
+
+pub fn upload_clipboard_image_path_cached<C, R>(
+    config: &AppConfig,
+    invocation: &SshInvocation,
+    clipboard: &mut C,
+    uploader: &mut Uploader<R>,
+    cache: &mut ClipboardImageUploadCache,
+) -> Result<Option<String>>
+where
+    C: ClipboardReader,
+    R: CommandRunner,
+{
     let ClipboardContent::Image(image) = clipboard.read()? else {
         return Ok(None);
     };
+
+    let fingerprint = ClipboardImageFingerprint::from_image(&image);
+    if let Some(cached) = cache.last.as_ref() {
+        if cached.fingerprint == fingerprint {
+            return Ok(Some(cached.rendered_path.clone()));
+        }
+    }
 
     let temp = NamedTempFile::new()?;
     image.save_png(temp.path())?;
@@ -41,7 +63,39 @@ where
         &config.image_format,
     );
     uploader.upload(invocation, temp.path(), &remote)?;
-    Ok(Some(render_template(&config.template, &remote)))
+    let rendered_path = render_template(&config.template, &remote);
+    cache.last = Some(CachedClipboardImageUpload {
+        fingerprint,
+        rendered_path: rendered_path.clone(),
+    });
+    Ok(Some(rendered_path))
+}
+
+#[derive(Default)]
+pub struct ClipboardImageUploadCache {
+    last: Option<CachedClipboardImageUpload>,
+}
+
+struct CachedClipboardImageUpload {
+    fingerprint: ClipboardImageFingerprint,
+    rendered_path: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct ClipboardImageFingerprint {
+    width: usize,
+    height: usize,
+    rgba: Vec<u8>,
+}
+
+impl ClipboardImageFingerprint {
+    fn from_image(image: &crate::clipboard::ClipboardImage) -> Self {
+        Self {
+            width: image.width,
+            height: image.height,
+            rgba: image.rgba.clone(),
+        }
+    }
 }
 
 pub fn run_terminal_session(config: AppConfig, invocation: SshInvocation) -> Result<()> {
@@ -87,10 +141,17 @@ fn run_image_hotkey_worker(
     let mut clipboard = SystemClipboard::new()?;
     let mut uploader = Uploader::new(SystemCommandRunner);
     let mut inserter = ClipboardPastePathInserter;
+    let mut upload_cache = ClipboardImageUploadCache::default();
 
     while running.load(Ordering::SeqCst) {
         if hotkey_events.recv_timeout(HOTKEY_POLL_TIMEOUT) {
-            match upload_clipboard_image_path(&config, &invocation, &mut clipboard, &mut uploader) {
+            match upload_clipboard_image_path_cached(
+                &config,
+                &invocation,
+                &mut clipboard,
+                &mut uploader,
+                &mut upload_cache,
+            ) {
                 Ok(Some(path)) => {
                     wait_for_hotkey_release(&hotkey_events.spec, &physical_keys, &running);
                     hotkey_events.drain();
@@ -153,6 +214,26 @@ impl KeyboardHotkeySpec {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+struct ForegroundWindowGate {
+    allowed_window: Option<usize>,
+}
+
+impl ForegroundWindowGate {
+    fn current() -> Self {
+        Self {
+            allowed_window: current_foreground_window_id(),
+        }
+    }
+
+    fn allows(&self, current_window: Option<usize>) -> bool {
+        match self.allowed_window {
+            Some(allowed_window) => current_window == Some(allowed_window),
+            None => true,
+        }
+    }
+}
+
 struct KeyboardHotkeyEvents {
     spec: KeyboardHotkeySpec,
     receiver: Receiver<()>,
@@ -178,6 +259,7 @@ impl KeyboardHotkeyEvents {
 #[derive(Clone)]
 struct KeyboardHookState {
     spec: KeyboardHotkeySpec,
+    foreground_gate: ForegroundWindowGate,
     sender: mpsc::Sender<()>,
 }
 
@@ -193,9 +275,14 @@ fn install_keyboard_hook(spec: KeyboardHotkeySpec) -> Result<Receiver<()>> {
 
     let (sender, receiver) = mpsc::channel();
     let (ready_sender, ready_receiver) = mpsc::channel();
+    let foreground_gate = ForegroundWindowGate::current();
     thread::spawn(move || {
         if let Ok(mut state) = KEYBOARD_HOOK_STATE.lock() {
-            *state = Some(KeyboardHookState { spec, sender });
+            *state = Some(KeyboardHookState {
+                spec,
+                foreground_gate,
+                sender,
+            });
         }
 
         unsafe extern "system" fn hook_proc(
@@ -208,7 +295,9 @@ fn install_keyboard_hook(spec: KeyboardHotkeySpec) -> Result<Receiver<()>> {
                 if let Ok(state) = KEYBOARD_HOOK_STATE.lock() {
                     if let Some(state) = state.as_ref() {
                         let key_vk = event.vkCode as i32;
-                        if state.spec.matches(key_vk, is_key_pressed) {
+                        if state.foreground_gate.allows(current_foreground_window_id())
+                            && state.spec.matches(key_vk, is_key_pressed)
+                        {
                             let _ = state.sender.send(());
                         }
                     }
@@ -245,6 +334,21 @@ fn install_keyboard_hook(_spec: KeyboardHotkeySpec) -> Result<Receiver<()>> {
 
 fn is_key_pressed(key_vk: i32) -> bool {
     unsafe { windows_sys::Win32::UI::Input::KeyboardAndMouse::GetAsyncKeyState(key_vk) < 0 }
+}
+
+#[cfg(windows)]
+fn current_foreground_window_id() -> Option<usize> {
+    let window = unsafe { windows_sys::Win32::UI::WindowsAndMessaging::GetForegroundWindow() };
+    if window.is_null() {
+        None
+    } else {
+        Some(window as usize)
+    }
+}
+
+#[cfg(not(windows))]
+fn current_foreground_window_id() -> Option<usize> {
+    None
 }
 
 trait RemotePathInserter {
@@ -364,10 +468,13 @@ mod tests {
     }
 
     #[derive(Default)]
-    struct FakeRunner;
+    struct FakeRunner {
+        calls: usize,
+    }
 
     impl CommandRunner for FakeRunner {
         fn run(&mut self, _program: &str, _args: &[String]) -> Result<CommandResult> {
+            self.calls += 1;
             Ok(CommandResult {
                 success: true,
                 code: Some(0),
@@ -383,7 +490,7 @@ mod tests {
         let mut clipboard = FakeClipboard {
             content: ClipboardContent::Text("line1\r\nline2".to_string()),
         };
-        let mut uploader = Uploader::new(FakeRunner);
+        let mut uploader = Uploader::new(FakeRunner::default());
 
         let path = upload_clipboard_image_path(&config, &invocation, &mut clipboard, &mut uploader)
             .unwrap();
@@ -398,7 +505,7 @@ mod tests {
         let mut clipboard = FakeClipboard {
             content: ClipboardContent::Empty,
         };
-        let mut uploader = Uploader::new(FakeRunner);
+        let mut uploader = Uploader::new(FakeRunner::default());
 
         let path = upload_clipboard_image_path(&config, &invocation, &mut clipboard, &mut uploader)
             .unwrap();
@@ -417,7 +524,7 @@ mod tests {
                 rgba: vec![0, 0, 0, 255],
             }),
         };
-        let mut uploader = Uploader::new(FakeRunner);
+        let mut uploader = Uploader::new(FakeRunner::default());
 
         let path = upload_clipboard_image_path(&config, &invocation, &mut clipboard, &mut uploader)
             .unwrap()
@@ -425,6 +532,82 @@ mod tests {
 
         assert!(path.starts_with("~/Pictures/paste-ssh/"));
         assert!(path.ends_with(".png"));
+    }
+
+    #[test]
+    fn repeated_same_clipboard_image_reuses_cached_path_without_uploading_again() {
+        let config = AppConfig::load(None, Default::default()).unwrap();
+        let invocation = SshInvocation::parse(vec!["host".to_string()]).unwrap();
+        let image = ClipboardImage {
+            width: 1,
+            height: 1,
+            rgba: vec![0, 0, 0, 255],
+        };
+        let mut clipboard = FakeClipboard {
+            content: ClipboardContent::Image(image.clone()),
+        };
+        let mut uploader = Uploader::new(FakeRunner::default());
+        let mut cache = ClipboardImageUploadCache::default();
+
+        let first = upload_clipboard_image_path_cached(
+            &config,
+            &invocation,
+            &mut clipboard,
+            &mut uploader,
+            &mut cache,
+        )
+        .unwrap();
+        clipboard.content = ClipboardContent::Image(image);
+        let second = upload_clipboard_image_path_cached(
+            &config,
+            &invocation,
+            &mut clipboard,
+            &mut uploader,
+            &mut cache,
+        )
+        .unwrap();
+
+        assert_eq!(second, first);
+        assert_eq!(uploader.runner.calls, 2);
+    }
+
+    #[test]
+    fn changed_clipboard_image_uploads_again() {
+        let config = AppConfig::load(None, Default::default()).unwrap();
+        let invocation = SshInvocation::parse(vec!["host".to_string()]).unwrap();
+        let mut clipboard = FakeClipboard {
+            content: ClipboardContent::Image(ClipboardImage {
+                width: 1,
+                height: 1,
+                rgba: vec![0, 0, 0, 255],
+            }),
+        };
+        let mut uploader = Uploader::new(FakeRunner::default());
+        let mut cache = ClipboardImageUploadCache::default();
+
+        upload_clipboard_image_path_cached(
+            &config,
+            &invocation,
+            &mut clipboard,
+            &mut uploader,
+            &mut cache,
+        )
+        .unwrap();
+        clipboard.content = ClipboardContent::Image(ClipboardImage {
+            width: 1,
+            height: 1,
+            rgba: vec![255, 0, 0, 255],
+        });
+        upload_clipboard_image_path_cached(
+            &config,
+            &invocation,
+            &mut clipboard,
+            &mut uploader,
+            &mut cache,
+        )
+        .unwrap();
+
+        assert_eq!(uploader.runner.calls, 4);
     }
 
     #[test]
@@ -443,5 +626,34 @@ mod tests {
         let spec = KeyboardHotkeySpec::from_hotkey(&hotkey);
 
         assert!(!spec.matches('V' as i32, |_key| false));
+    }
+
+    #[test]
+    fn foreground_window_gate_allows_startup_window() {
+        let gate = ForegroundWindowGate {
+            allowed_window: Some(10),
+        };
+
+        assert!(gate.allows(Some(10)));
+    }
+
+    #[test]
+    fn foreground_window_gate_rejects_other_windows() {
+        let gate = ForegroundWindowGate {
+            allowed_window: Some(10),
+        };
+
+        assert!(!gate.allows(Some(11)));
+        assert!(!gate.allows(None));
+    }
+
+    #[test]
+    fn foreground_window_gate_without_startup_window_does_not_block_hotkeys() {
+        let gate = ForegroundWindowGate {
+            allowed_window: None,
+        };
+
+        assert!(gate.allows(Some(11)));
+        assert!(gate.allows(None));
     }
 }

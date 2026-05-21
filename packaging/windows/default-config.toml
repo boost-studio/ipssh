@@ -3,7 +3,7 @@
 # This file is installed to:
 # %APPDATA%\ipssh\config.toml
 
-paste_hotkey = "ctrl+v"
+paste_hotkey = "alt+v"
 remote_dir = "~/Pictures/paste-ssh"
 image_format = "png"
 non_image_paste = "text"

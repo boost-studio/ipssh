@@ -14,7 +14,7 @@ For design details, see [docs/design.md](docs/design.md).
 
 `ipssh` does not implement its own terminal emulator. The SSH process inherits the current console, so ordinary input, `Shift+Insert`, multiline paste, `Ctrl+C`, `Ctrl+D`, colors, and full-screen terminal programs behave like plain OpenSSH.
 
-In parallel, a background worker installs a low-level Windows keyboard hook for the configured hotkey. When that hotkey is pressed, the worker checks the clipboard. If the clipboard contains an image, it uploads the image through OpenSSH tools and temporarily places the generated remote path on the clipboard, then simulates `Shift+Insert` to paste the path into the SSH session. If the clipboard is not an image, `ipssh` does nothing and the terminal handles the paste normally.
+In parallel, a background worker installs a low-level Windows keyboard hook for the configured hotkey. When that hotkey is pressed, the worker checks the clipboard. If the clipboard contains an image, it uploads the image through OpenSSH tools and temporarily places the generated remote path on the clipboard, then simulates `Shift+Insert` to paste the path into the SSH session. If the same clipboard image is pasted again in the same `ipssh` session, the previous remote path is reused without uploading again. If the clipboard is not an image, `ipssh` does nothing and the terminal handles the paste normally.
 
 ```mermaid
 flowchart LR
@@ -123,7 +123,7 @@ Replace `james@192.168.100.202` with your SSH target or host alias.
 
 1. Copy an image to the Windows clipboard.
 2. Focus the `ipssh` terminal.
-3. Press the configured image paste hotkey. The default is `Ctrl+V`.
+3. Press the configured image paste hotkey. The default is `Alt+V`.
 
 `ipssh` will:
 
@@ -131,6 +131,8 @@ Replace `james@192.168.100.202` with your SSH target or host alias.
 2. Run `ssh` to create the remote upload directory.
 3. Run `scp` to upload the image.
 4. Paste the rendered remote path into the active SSH session.
+
+If the clipboard image has not changed since the previous image paste in the same `ipssh` session, `ipssh` skips `ssh` and `scp` and pastes the cached remote path again.
 
 The default remote directory is:
 
@@ -161,7 +163,7 @@ The default config file is:
 Example:
 
 ```toml
-paste_hotkey = "ctrl+v"
+paste_hotkey = "alt+v"
 remote_dir = "~/Pictures/paste-ssh"
 image_format = "png"
 non_image_paste = "text"
@@ -173,7 +175,7 @@ filename_pattern = "{timestamp}-{random}.{ext}"
 
 Configuration values:
 
-- `paste_hotkey`: Image paste hotkey. Examples: `ctrl+v`, `ctrl+shift+v`.
+- `paste_hotkey`: Image paste hotkey. Examples: `alt+v`, `ctrl+shift+v`.
 - `remote_dir`: Remote directory for uploaded images.
 - `image_format`: Image output format. Currently supported: `png`.
 - `non_image_paste`: Legacy/reserved setting. Current behavior leaves non-image paste to the terminal.

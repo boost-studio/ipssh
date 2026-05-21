@@ -71,7 +71,7 @@ impl AppConfig {
         let paste_hotkey = overrides
             .paste_hotkey
             .or(raw.paste_hotkey)
-            .unwrap_or_else(|| "ctrl+v".to_string());
+            .unwrap_or_else(|| "alt+v".to_string());
         let remote_dir = overrides
             .remote_dir
             .or(raw.remote_dir)
@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn defaults_match_design_spec() {
         let cfg = AppConfig::load(None, ConfigOverrides::default()).unwrap();
-        assert_eq!(cfg.paste_hotkey, "ctrl+v");
+        assert_eq!(cfg.paste_hotkey, "alt+v");
         assert_eq!(cfg.remote_dir, "~/Pictures/paste-ssh");
         assert_eq!(cfg.image_format, "png");
         assert_eq!(cfg.non_image_paste, NonImagePaste::Text);

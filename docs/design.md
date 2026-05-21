@@ -7,7 +7,7 @@ This document describes the final design of `ipssh`. Earlier design notes and im
 `ipssh` is short for image paste ssh. It is a Windows command-line wrapper around OpenSSH with an intentionally narrow job:
 
 - Run a normal interactive `ssh.exe` session.
-- Detect a configured image paste hotkey, defaulting to `Ctrl+V`.
+- Detect a configured image paste hotkey, defaulting to `Alt+V`.
 - If the Windows clipboard contains an image, upload that image to the SSH target with `scp`.
 - Paste the generated remote image path into the active SSH session.
 - Leave ordinary terminal behavior to Windows Terminal and OpenSSH.
@@ -26,7 +26,7 @@ Text paste also has to remain reliable. Some SSH clients or terminal wrappers ha
 
 The current architecture avoids a custom terminal bridge. `ssh.exe` is launched as a normal child process and inherits stdin/stdout/stderr from the current console. This preserves direct OpenSSH behavior for text paste, multiline paste, `Shift+Insert`, `Ctrl+C`, `Ctrl+D`, colors, terminal control sequences, and full-screen programs.
 
-`ipssh` adds a sidecar worker thread. The worker installs a low-level Windows keyboard hook for the configured hotkey. The hook observes keydown events and sends a notification to the worker; it does not consume or rewrite keyboard input. The worker then checks the clipboard. Only image clipboard content is handled by `ipssh`.
+`ipssh` adds a sidecar worker thread. The worker installs a low-level Windows keyboard hook for the configured hotkey. The hook observes keydown events and sends a notification to the worker; it does not consume or rewrite keyboard input. The worker then checks the clipboard. Only image clipboard content is handled by `ipssh`. The worker keeps a one-entry in-memory cache for the last uploaded clipboard image and rendered remote path.
 
 ```mermaid
 flowchart TB
@@ -48,7 +48,7 @@ flowchart TB
 
 - `src/lib.rs`: CLI parsing, config loading, SSH argument parsing, and top-level orchestration.
 - `src/config.rs`: TOML config loading, defaults, and command-line override merging.
-- `src/hotkey.rs`: Parse hotkey strings such as `ctrl+v` and expose physical key state helpers.
+- `src/hotkey.rs`: Parse hotkey strings such as `alt+v` and expose physical key state helpers.
 - `src/ssh_args.rs`: Identify the SSH target and convert relevant `ssh` options to `scp` options.
 - `src/remote_path.rs`: Generate filenames and remote paths.
 - `src/template.rs`: Render inserted text from `{remote_path}`, `{remote_dir}`, and `{filename}`.
@@ -67,6 +67,8 @@ flowchart TB
 6. When the configured hotkey is pressed, the worker checks the clipboard.
 7. If the clipboard is not an image, the worker does nothing.
 8. If the clipboard is an image:
+   - Compare the image width, height, and RGBA bytes with the last uploaded clipboard image.
+   - If unchanged, reuse the cached rendered remote path and skip upload.
    - Save it as a temporary PNG.
    - Generate the remote path.
    - Run `ssh <args> mkdir -p <remote_dir>`.
@@ -92,9 +94,13 @@ The configured hotkey is an image upload shortcut. It is not a general paste imp
 
 If the clipboard contains text, empty data, or unsupported data, `ipssh` does nothing. Native terminal paste behavior continues to apply. This is especially important for `Shift+Insert` and multiline text paste.
 
+### Repeated Image Cache
+
+Within one `ipssh` session, the worker remembers the most recently uploaded clipboard image and the rendered remote path it pasted. If the next image hotkey press sees the same width, height, and RGBA bytes, `ipssh` treats it as unchanged, skips `ssh`/`scp`, and pastes the same rendered path again. A different image replaces the cache after a successful upload.
+
 ### Low-Level Keyboard Hook
 
-Polling `GetAsyncKeyState` on a timer can miss fast `Ctrl+V` presses. The final implementation uses `WH_KEYBOARD_LL` to observe keydown events for the configured hotkey. This makes normal quick hotkey presses reliable without consuming the original keyboard input.
+Polling `GetAsyncKeyState` on a timer can miss fast hotkey presses. The final implementation uses `WH_KEYBOARD_LL` to observe keydown events for the configured hotkey. This makes normal quick hotkey presses reliable without consuming the original keyboard input.
 
 The hook is intentionally narrow:
 
@@ -106,7 +112,7 @@ The hook is intentionally narrow:
 
 After upload, `ipssh` inserts the generated path by temporarily setting clipboard text and sending `Shift+Insert`. This matches normal terminal paste behavior better than typing characters one by one. It also avoids reimplementing shell/editor paste behavior.
 
-The worker waits for the configured hotkey keys to be released before sending `Shift+Insert`, so `Ctrl+V` does not accidentally become `Ctrl+Shift+Insert`.
+The worker waits for the configured hotkey keys to be released before sending `Shift+Insert`, so the image hotkey modifiers do not accidentally affect the synthetic paste.
 
 ## Configuration
 
@@ -119,7 +125,7 @@ Default config path:
 Default config:
 
 ```toml
-paste_hotkey = "ctrl+v"
+paste_hotkey = "alt+v"
 remote_dir = "~/Pictures/paste-ssh"
 image_format = "png"
 non_image_paste = "text"
@@ -171,6 +177,8 @@ Automated tests cover:
 - Uploader command construction.
 - Image-only shortcut semantics.
 - Keyboard hook hotkey matching logic.
+- Repeated identical clipboard image paste reuses the cached path without uploading again.
+- Changed clipboard image content uploads again.
 - CLI smoke behavior.
 - Installer config path and legacy config migration.
 
@@ -179,7 +187,7 @@ Manual and end-to-end checks should cover:
 - Connecting to a real SSH server.
 - `Ctrl+D` returns to the local prompt.
 - `Shift+Insert` multiline paste behaves like plain OpenSSH.
-- Quick `Ctrl+V` with an image uploads and pastes the remote path.
+- Quick `Alt+V` with an image uploads and pastes the remote path.
 - Text clipboard with the configured hotkey does not trigger upload.
 - Upload failure leaves the SSH session alive and does not paste a path.
 
