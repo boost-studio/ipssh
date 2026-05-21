@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
   <title id="title">ipssh architecture</title>
-  <desc id="desc">The user runs ipssh. ipssh launches ssh.exe and runs a sidecar that uploads clipboard images.</desc>
+  <desc id="desc">The user runs ipssh. ipssh calls native ssh.exe and scp.exe tools.</desc>
   <defs>
     <marker id="arrowDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#344054"/>
@@ -15,6 +15,7 @@
       .bg { fill: #f7f8fb; }
       .panel { fill: #ffffff; stroke: #d0d5dd; stroke-width: 1.4; filter: url(#shadow); }
       .container { fill: #f8fafc; stroke: #64748b; stroke-width: 1.8; }
+      .tools { fill: #f8fbff; stroke: #60a5fa; stroke-width: 1.6; }
       .band { fill: #eef2f6; stroke: #cbd5e1; stroke-width: 1.2; }
       .blue { fill: #eff8ff; stroke: #2e90fa; stroke-width: 1.7; }
       .green { fill: #ecfdf3; stroke: #12b76a; stroke-width: 1.7; }
@@ -40,84 +41,90 @@
   <rect class="panel" x="36" y="30" width="1208" height="700" rx="18"/>
 
   <text class="title" x="78" y="78">ipssh architecture</text>
-  <text class="subtitle" x="78" y="108">The user runs ipssh. ipssh launches OpenSSH for the terminal session and handles only clipboard image paste events.</text>
+  <text class="subtitle" x="78" y="108">ipssh wraps native OpenSSH tools: ssh.exe owns the terminal session, scp.exe uploads images.</text>
 
-  <rect class="blue" x="78" y="206" width="205" height="82" rx="12"/>
-  <text class="label" x="180.5" y="240">User</text>
-  <text class="small" x="180.5" y="264">Windows Terminal</text>
+  <rect class="blue" x="72" y="206" width="198" height="82" rx="12"/>
+  <text class="label" x="171" y="240">User</text>
+  <text class="small" x="171" y="264">Windows Terminal</text>
 
-  <rect class="container" x="336" y="138" width="704" height="538" rx="20"/>
-  <text class="sectionTitle" x="366" y="174">ipssh process</text>
-  <text class="subtitle" x="366" y="198">wraps OpenSSH instead of implementing SSH</text>
+  <rect class="container" x="318" y="138" width="620" height="538" rx="20"/>
+  <text class="sectionTitle" x="348" y="174">ipssh process</text>
+  <text class="subtitle" x="348" y="198">orchestrates native tools; does not implement SSH</text>
 
-  <rect class="band" x="370" y="222" width="636" height="154" rx="16"/>
-  <rect class="badge" x="392" y="244" width="142" height="30" rx="15"/>
-  <text class="badgeText" x="463" y="264">native SSH</text>
+  <rect class="band" x="352" y="222" width="552" height="150" rx="16"/>
+  <rect class="badge" x="374" y="244" width="142" height="30" rx="15"/>
+  <text class="badgeText" x="445" y="264">terminal path</text>
 
-  <rect class="blue" x="418" y="296" width="210" height="58" rx="11"/>
-  <text class="label" x="523" y="321">launches</text>
-  <text class="small" x="523" y="342">ssh.exe</text>
+  <rect class="blue" x="410" y="294" width="190" height="58" rx="11"/>
+  <text class="label" x="505" y="319">calls</text>
+  <text class="small" x="505" y="340">ssh.exe</text>
 
-  <rect class="blue" x="754" y="286" width="210" height="78" rx="11"/>
-  <text class="label" x="859" y="318">ssh.exe</text>
-  <text class="small" x="859" y="342">owns terminal I/O</text>
+  <rect class="note" x="624" y="286" width="238" height="74" rx="10"/>
+  <text class="tiny" x="743" y="309">Native terminal behavior</text>
+  <text class="tiny" x="743" y="327">stays intact: text paste,</text>
+  <text class="tiny" x="743" y="345">Ctrl+C, Ctrl+D, full-screen apps</text>
 
-  <rect class="note" x="520" y="232" width="350" height="44" rx="10"/>
-  <text class="tiny" x="695" y="252">Native terminal behavior stays intact</text>
-  <text class="tiny" x="695" y="268">text paste, Ctrl+C, Ctrl+D, full-screen apps</text>
+  <rect class="band" x="352" y="414" width="552" height="226" rx="16"/>
+  <rect class="badge" x="374" y="436" width="150" height="30" rx="15"/>
+  <text class="badgeText" x="449" y="456">image sidecar</text>
 
-  <rect class="band" x="370" y="416" width="636" height="222" rx="16"/>
-  <rect class="badge" x="392" y="438" width="150" height="30" rx="15"/>
-  <text class="badgeText" x="467" y="458">image sidecar</text>
+  <rect class="green" x="388" y="496" width="142" height="70" rx="11"/>
+  <text class="label" x="459" y="524">Alt+V</text>
+  <text class="small" x="459" y="546">hotkey</text>
 
-  <rect class="green" x="408" y="498" width="164" height="70" rx="11"/>
-  <text class="label" x="490" y="526">Alt+V</text>
-  <text class="small" x="490" y="548">hotkey hook</text>
+  <rect class="green" x="570" y="496" width="146" height="70" rx="11"/>
+  <text class="label" x="643" y="524">Clipboard</text>
+  <text class="small" x="643" y="546">image only</text>
 
-  <rect class="green" x="618" y="498" width="166" height="70" rx="11"/>
-  <text class="label" x="701" y="526">Clipboard</text>
-  <text class="small" x="701" y="548">image only</text>
+  <rect class="green" x="756" y="496" width="126" height="70" rx="11"/>
+  <text class="label" x="819" y="524">Cache</text>
+  <text class="small" x="819" y="546">last image</text>
 
-  <rect class="green" x="828" y="498" width="142" height="70" rx="11"/>
-  <text class="label" x="899" y="526">Upload</text>
-  <text class="small" x="899" y="548">cache last</text>
+  <path class="decision" d="M 754 604 L 819 570 L 884 604 L 819 638 Z"/>
+  <text class="tiny" x="819" y="599">same</text>
+  <text class="tiny" x="819" y="615">image?</text>
 
-  <rect class="amber" x="554" y="586" width="250" height="42" rx="10"/>
-  <text class="small" x="679" y="604">non-image paste</text>
-  <text class="tiny" x="679" y="620">left to Windows Terminal</text>
+  <rect class="amber" x="488" y="590" width="210" height="42" rx="10"/>
+  <text class="small" x="593" y="608">non-image paste</text>
+  <text class="tiny" x="593" y="624">left to Windows Terminal</text>
 
-  <path class="decision" d="M 1110 468 L 1158 424 L 1206 468 L 1158 512 Z"/>
-  <text class="tiny" x="1158" y="463">same</text>
-  <text class="tiny" x="1158" y="479">image?</text>
+  <rect class="tools" x="986" y="138" width="226" height="538" rx="20"/>
+  <text class="sectionTitle" x="1016" y="174">native OpenSSH tools</text>
 
-  <rect class="green" x="1084" y="548" width="148" height="70" rx="11"/>
-  <text class="label" x="1158" y="578">scp PNG</text>
-  <text class="tiny" x="1158" y="599">mkdir if needed</text>
+  <rect class="blue" x="1026" y="232" width="150" height="78" rx="11"/>
+  <text class="label" x="1101" y="264">ssh.exe</text>
+  <text class="small" x="1101" y="288">terminal I/O</text>
 
-  <rect class="blue" x="1084" y="232" width="148" height="84" rx="11"/>
-  <text class="label" x="1158" y="265">SSH server</text>
-  <text class="small" x="1158" y="289">remote shell</text>
+  <rect class="green" x="1026" y="480" width="150" height="78" rx="11"/>
+  <text class="label" x="1101" y="512">scp.exe</text>
+  <text class="small" x="1101" y="536">upload PNG</text>
 
-  <rect class="note" x="1060" y="356" width="196" height="48" rx="10"/>
-  <text class="tiny" x="1158" y="376">rendered remote path</text>
-  <text class="tiny" x="1158" y="392">pasted via Shift+Insert</text>
+  <rect class="green" x="1026" y="584" width="150" height="56" rx="11"/>
+  <text class="small" x="1101" y="606">mkdir if needed</text>
+  <text class="tiny" x="1101" y="624">before upload</text>
 
-  <path class="darkLine" d="M 283 247 L 336 247"/>
-  <text class="tiny" x="309" y="232">runs</text>
+  <rect class="blue" x="1026" y="346" width="150" height="74" rx="11"/>
+  <text class="label" x="1101" y="378">SSH server</text>
+  <text class="small" x="1101" y="400">remote shell</text>
 
-  <path class="darkLine" d="M 628 325 L 754 325"/>
-  <path class="darkLine" d="M 964 325 C 1004 315, 1037 292, 1084 276"/>
-  <path class="darkReturn" d="M 1084 305 C 1010 382, 1004 383, 964 352"/>
+  <rect class="note" x="946" y="690" width="256" height="44" rx="10"/>
+  <text class="tiny" x="1074" y="709">Yes: reuse cached remote path</text>
+  <text class="tiny" x="1074" y="725">and paste it without scp.exe</text>
 
-  <path class="greenLine" d="M 572 533 L 618 533"/>
-  <path class="greenLine" d="M 784 533 L 828 533"/>
-  <path class="greenLine" d="M 970 533 C 1010 518, 1050 492, 1110 468"/>
-  <text class="tiny" x="1030" y="500">compare</text>
-  <path class="greenLine" d="M 1158 512 L 1158 548"/>
-  <text class="tiny" x="1178" y="534">No</text>
-  <path class="greenLine" d="M 1206 468 C 1224 448, 1224 410, 1250 380"/>
-  <path class="greenLine" d="M 1158 548 L 1158 404"/>
-  <text class="tiny" x="1228" y="444">Yes: reuse path</text>
-  <path class="greenLine" d="M 1158 356 L 1158 316"/>
-  <path class="mutedLine" d="M 701 568 L 701 586"/>
+  <path class="darkLine" d="M 270 247 L 318 247"/>
+  <text class="tiny" x="294" y="232">runs</text>
+
+  <path class="darkLine" d="M 600 323 L 986 271"/>
+  <path class="darkLine" d="M 1101 310 L 1101 346"/>
+  <path class="darkReturn" d="M 1026 400 C 948 438, 916 392, 862 360"/>
+
+  <path class="greenLine" d="M 530 531 L 570 531"/>
+  <path class="greenLine" d="M 716 531 L 756 531"/>
+  <path class="greenLine" d="M 819 566 L 819 570"/>
+  <path class="greenLine" d="M 884 604 C 928 570, 966 532, 1026 519"/>
+  <text class="tiny" x="952" y="554">No: upload</text>
+  <path class="greenLine" d="M 819 638 C 850 700, 894 712, 946 712"/>
+  <text class="tiny" x="890" y="692">Yes</text>
+  <path class="greenLine" d="M 1101 480 L 1101 420"/>
+  <path class="mutedLine" d="M 643 566 L 643 590"/>
 </svg>
