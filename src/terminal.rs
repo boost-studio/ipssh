@@ -18,6 +18,8 @@ use tempfile::NamedTempFile;
 
 const HOTKEY_POLL_TIMEOUT: Duration = Duration::from_millis(50);
 const CLIPBOARD_RESTORE_DELAY: Duration = Duration::from_millis(250);
+const CLIPBOARD_RESTORE_RETRY_DELAY: Duration = Duration::from_millis(50);
+const CLIPBOARD_RESTORE_ATTEMPTS: usize = 40;
 
 pub fn upload_clipboard_image_path<C, R>(
     config: &AppConfig,
@@ -261,50 +263,138 @@ impl RemotePathInserter for ClipboardPastePathInserter {
 
 #[cfg(windows)]
 fn paste_text_via_clipboard(text: &str) -> Result<()> {
-    use arboard::{Clipboard, ImageData};
-    use std::borrow::Cow;
-
-    let mut clipboard = Clipboard::new().context("failed to open Windows clipboard")?;
-    let previous = if let Ok(image) = clipboard.get_image() {
-        Some(ClipboardContent::Image(crate::clipboard::ClipboardImage {
-            width: image.width,
-            height: image.height,
-            rgba: image.bytes.into_owned(),
-        }))
-    } else if let Ok(text) = clipboard.get_text() {
-        Some(ClipboardContent::Text(text))
-    } else {
-        None
-    };
-
-    clipboard
-        .set_text(text.to_string())
-        .context("failed to set clipboard text for paste")?;
-    send_shift_insert()?;
-    thread::sleep(CLIPBOARD_RESTORE_DELAY);
-
-    if let Some(previous) = previous {
-        match previous {
-            ClipboardContent::Image(image) => clipboard
-                .set_image(ImageData {
-                    width: image.width,
-                    height: image.height,
-                    bytes: Cow::Owned(image.rgba),
-                })
-                .context("failed to restore clipboard image")?,
-            ClipboardContent::Text(text) => clipboard
-                .set_text(text)
-                .context("failed to restore clipboard text")?,
-            ClipboardContent::Empty => {}
-        }
-    }
-
-    Ok(())
+    let mut clipboard = SystemPasteClipboard::new()?;
+    paste_text_via_clipboard_with(&mut clipboard, text, send_shift_insert, |duration| {
+        thread::sleep(duration)
+    })
 }
 
 #[cfg(not(windows))]
 fn paste_text_via_clipboard(_text: &str) -> Result<()> {
     anyhow::bail!("clipboard paste insertion is only supported on Windows")
+}
+
+trait PasteClipboard {
+    fn read_content(&mut self) -> Result<Option<ClipboardContent>>;
+    fn set_text(&mut self, text: String) -> Result<()>;
+    fn set_content(&mut self, content: Option<ClipboardContent>) -> Result<()>;
+}
+
+fn paste_text_via_clipboard_with<C, P, S>(
+    clipboard: &mut C,
+    text: &str,
+    mut send_paste: P,
+    mut sleep: S,
+) -> Result<()>
+where
+    C: PasteClipboard,
+    P: FnMut() -> Result<()>,
+    S: FnMut(Duration),
+{
+    let previous = clipboard.read_content()?;
+    clipboard
+        .set_text(text.to_string())
+        .context("failed to set clipboard text for paste")?;
+
+    let paste_result = send_paste();
+    sleep(CLIPBOARD_RESTORE_DELAY);
+    let restore_result = restore_clipboard_with_retry(clipboard, previous, &mut sleep);
+
+    paste_result?;
+    restore_result?;
+    Ok(())
+}
+
+fn restore_clipboard_with_retry<C, S>(
+    clipboard: &mut C,
+    content: Option<ClipboardContent>,
+    sleep: &mut S,
+) -> Result<()>
+where
+    C: PasteClipboard,
+    S: FnMut(Duration),
+{
+    let mut last_error = None;
+    for attempt in 0..CLIPBOARD_RESTORE_ATTEMPTS {
+        match clipboard.set_content(content.clone()) {
+            Ok(()) => return Ok(()),
+            Err(error) => {
+                last_error = Some(error);
+                if attempt + 1 < CLIPBOARD_RESTORE_ATTEMPTS {
+                    sleep(CLIPBOARD_RESTORE_RETRY_DELAY);
+                }
+            }
+        }
+    }
+
+    Err(last_error
+        .unwrap_or_else(|| anyhow::anyhow!("failed to restore clipboard"))
+        .context("failed to restore clipboard after paste"))
+}
+
+#[cfg(windows)]
+struct SystemPasteClipboard {
+    inner: arboard::Clipboard,
+}
+
+#[cfg(windows)]
+impl SystemPasteClipboard {
+    fn new() -> Result<Self> {
+        Ok(Self {
+            inner: arboard::Clipboard::new().context("failed to open Windows clipboard")?,
+        })
+    }
+}
+
+#[cfg(windows)]
+impl PasteClipboard for SystemPasteClipboard {
+    fn read_content(&mut self) -> Result<Option<ClipboardContent>> {
+        if let Ok(image) = self.inner.get_image() {
+            return Ok(Some(ClipboardContent::Image(
+                crate::clipboard::ClipboardImage {
+                    width: image.width,
+                    height: image.height,
+                    rgba: image.bytes.into_owned(),
+                },
+            )));
+        }
+
+        if let Ok(text) = self.inner.get_text() {
+            return Ok(Some(ClipboardContent::Text(text)));
+        }
+
+        Ok(None)
+    }
+
+    fn set_text(&mut self, text: String) -> Result<()> {
+        self.inner
+            .set_text(text)
+            .context("failed to set clipboard text")
+    }
+
+    fn set_content(&mut self, content: Option<ClipboardContent>) -> Result<()> {
+        use arboard::ImageData;
+        use std::borrow::Cow;
+
+        match content {
+            Some(ClipboardContent::Image(image)) => self
+                .inner
+                .set_image(ImageData {
+                    width: image.width,
+                    height: image.height,
+                    bytes: Cow::Owned(image.rgba),
+                })
+                .context("failed to restore clipboard image"),
+            Some(ClipboardContent::Text(text)) => self
+                .inner
+                .set_text(text)
+                .context("failed to restore clipboard text"),
+            Some(ClipboardContent::Empty) | None => self
+                .inner
+                .clear()
+                .context("failed to restore empty clipboard"),
+        }
+    }
 }
 
 #[cfg(windows)]
@@ -376,6 +466,31 @@ mod tests {
         }
     }
 
+    struct FakePasteClipboard {
+        content: Option<ClipboardContent>,
+        fail_image_restores: usize,
+    }
+
+    impl PasteClipboard for FakePasteClipboard {
+        fn read_content(&mut self) -> Result<Option<ClipboardContent>> {
+            Ok(self.content.clone())
+        }
+
+        fn set_text(&mut self, text: String) -> Result<()> {
+            self.content = Some(ClipboardContent::Text(text));
+            Ok(())
+        }
+
+        fn set_content(&mut self, content: Option<ClipboardContent>) -> Result<()> {
+            if matches!(content, Some(ClipboardContent::Image(_))) && self.fail_image_restores > 0 {
+                self.fail_image_restores -= 1;
+                anyhow::bail!("clipboard busy");
+            }
+            self.content = content;
+            Ok(())
+        }
+    }
+
     #[test]
     fn text_clipboard_on_image_shortcut_is_not_handled() {
         let config = AppConfig::load(None, Default::default()).unwrap();
@@ -443,5 +558,36 @@ mod tests {
         let spec = KeyboardHotkeySpec::from_hotkey(&hotkey);
 
         assert!(!spec.matches('V' as i32, |_key| false));
+    }
+
+    #[test]
+    fn paste_text_restores_image_clipboard_after_transient_restore_failure() {
+        let original = ClipboardContent::Image(ClipboardImage {
+            width: 1,
+            height: 1,
+            rgba: vec![1, 2, 3, 255],
+        });
+        let mut clipboard = FakePasteClipboard {
+            content: Some(original.clone()),
+            fail_image_restores: 1,
+        };
+        let mut paste_sent = false;
+        let mut sleeps = Vec::new();
+
+        paste_text_via_clipboard_with(
+            &mut clipboard,
+            "/tmp/uploaded.png",
+            || {
+                paste_sent = true;
+                Ok(())
+            },
+            |duration| sleeps.push(duration),
+        )
+        .unwrap();
+
+        assert!(paste_sent);
+        assert_eq!(clipboard.content, Some(original));
+        assert_eq!(clipboard.fail_image_restores, 0);
+        assert!(sleeps.len() >= 2);
     }
 }
