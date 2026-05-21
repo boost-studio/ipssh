@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="640" viewBox="0 0 1180 640" role="img" aria-labelledby="title desc">
+  <title id="title">ipssh architecture</title>
+  <desc id="desc">OpenSSH owns the interactive terminal while ipssh handles only clipboard image paste events.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#344054"/>
+    </marker>
+    <marker id="accentArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#147D64"/>
+    </marker>
+    <filter id="shadow" x="-8%" y="-10%" width="116%" height="125%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#101828" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .panel { fill: #ffffff; stroke: #d0d5dd; stroke-width: 1.5; filter: url(#shadow); }
+      .node { fill: #ffffff; stroke: #98a2b3; stroke-width: 1.4; }
+      .node-accent { fill: #ecfdf3; stroke: #12b76a; stroke-width: 1.6; }
+      .node-blue { fill: #eff8ff; stroke: #2e90fa; stroke-width: 1.6; }
+      .node-warn { fill: #fff8e8; stroke: #f79009; stroke-width: 1.6; }
+      .title { fill: #101828; font: 700 26px "Segoe UI", Arial, sans-serif; }
+      .subtitle { fill: #475467; font: 400 15px "Segoe UI", Arial, sans-serif; }
+      .label { fill: #101828; font: 700 16px "Segoe UI", Arial, sans-serif; }
+      .small { fill: #475467; font: 400 13px "Segoe UI", Arial, sans-serif; }
+      .tiny { fill: #667085; font: 400 12px "Segoe UI", Arial, sans-serif; }
+      .path { fill: none; stroke: #344054; stroke-width: 2.2; marker-end: url(#arrow); }
+      .path-muted { fill: none; stroke: #98a2b3; stroke-width: 1.8; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .path-accent { fill: none; stroke: #147D64; stroke-width: 2.4; marker-end: url(#accentArrow); }
+      .band { fill: #eef2f6; stroke: #d0d5dd; stroke-width: 1.2; }
+      .badge { fill: #344054; }
+      .badge-text { fill: #ffffff; font: 700 12px "Segoe UI", Arial, sans-serif; letter-spacing: .4px; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1180" height="640"/>
+  <rect class="panel" x="46" y="42" width="1088" height="556" rx="18"/>
+
+  <text class="title" x="86" y="88">ipssh architecture</text>
+  <text class="subtitle" x="86" y="116">OpenSSH keeps terminal behavior native. ipssh only handles clipboard images and pastes the uploaded remote path.</text>
+
+  <rect class="band" x="82" y="152" width="1016" height="140" rx="14"/>
+  <rect class="badge" x="102" y="174" width="118" height="28" rx="14"/>
+  <text class="badge-text" x="122" y="193">native SSH</text>
+
+  <rect class="node-blue" x="110" y="218" width="180" height="48" rx="10"/>
+  <text class="label" x="156" y="247">User</text>
+  <text class="small" x="136" y="278">Windows Terminal</text>
+
+  <rect class="node-blue" x="388" y="208" width="210" height="68" rx="10"/>
+  <text class="label" x="434" y="238">ssh.exe</text>
+  <text class="small" x="424" y="261">owns stdin / stdout</text>
+
+  <rect class="node-blue" x="786" y="208" width="210" height="68" rx="10"/>
+  <text class="label" x="835" y="238">SSH server</text>
+  <text class="small" x="824" y="261">remote shell / tools</text>
+
+  <path class="path" d="M 290 242 C 320 242, 350 242, 388 242"/>
+  <path class="path" d="M 598 242 C 655 242, 720 242, 786 242"/>
+  <path class="path-muted" d="M 786 264 C 720 302, 652 302, 598 264"/>
+  <text class="tiny" x="618" y="224">normal input, text paste, Ctrl+C, Ctrl+D</text>
+
+  <rect class="band" x="82" y="330" width="1016" height="226" rx="14"/>
+  <rect class="badge" x="102" y="352" width="150" height="28" rx="14"/>
+  <text class="badge-text" x="123" y="371">image sidecar</text>
+
+  <rect class="node-accent" x="110" y="400" width="180" height="72" rx="10"/>
+  <text class="label" x="152" y="430">Alt+V</text>
+  <text class="small" x="135" y="453">low-level hotkey hook</text>
+
+  <rect class="node-accent" x="348" y="400" width="190" height="72" rx="10"/>
+  <text class="label" x="377" y="430">Clipboard</text>
+  <text class="small" x="376" y="453">image only</text>
+
+  <rect class="node-accent" x="594" y="400" width="190" height="72" rx="10"/>
+  <text class="label" x="620" y="430">Upload worker</text>
+  <text class="small" x="626" y="453">cache last image</text>
+
+  <rect class="node-accent" x="840" y="382" width="190" height="54" rx="10"/>
+  <text class="label" x="881" y="415">ssh mkdir</text>
+
+  <rect class="node-accent" x="840" y="464" width="190" height="54" rx="10"/>
+  <text class="label" x="889" y="497">scp PNG</text>
+
+  <path class="path-accent" d="M 290 436 C 314 436, 326 436, 348 436"/>
+  <path class="path-accent" d="M 538 436 C 560 436, 572 436, 594 436"/>
+  <path class="path-accent" d="M 784 422 C 805 415, 819 410, 840 409"/>
+  <path class="path-accent" d="M 784 450 C 807 466, 819 482, 840 491"/>
+
+  <path class="path-accent" d="M 935 382 C 935 330, 935 304, 935 276"/>
+  <text class="tiny" x="947" y="333">remote file path</text>
+
+  <path class="path-accent" d="M 594 472 C 520 538, 360 538, 228 472"/>
+  <text class="tiny" x="332" y="530">set clipboard to path, send Shift+Insert, restore clipboard</text>
+
+  <rect class="node-warn" x="378" y="506" width="190" height="34" rx="9"/>
+  <text class="small" x="407" y="528">non-image paste passes through</text>
+
+  <path class="path-muted" d="M 443 472 C 443 486, 443 493, 443 506"/>
+</svg>

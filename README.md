@@ -16,22 +16,7 @@ For design details, see [docs/design.md](docs/design.md).
 
 In parallel, a background worker installs a low-level Windows keyboard hook for the configured hotkey. When that hotkey is pressed, the worker checks the clipboard. If the clipboard contains an image, it uploads the image through OpenSSH tools and temporarily places the generated remote path on the clipboard, then simulates `Shift+Insert` to paste the path into the SSH session. If the same clipboard image is pasted again in the same `ipssh` session, the previous remote path is reused without uploading again. If the clipboard is not an image, `ipssh` does nothing and the terminal handles the paste normally.
 
-```mermaid
-flowchart LR
-    User["User in Windows Terminal"] --> Key["Keyboard input"]
-    Key --> SSH["ssh.exe owns terminal input/output"]
-    SSH <--> Remote["Remote shell"]
-
-    Key --> Hook["ipssh hotkey hook"]
-    Hook --> Clip{"Clipboard image?"}
-    Clip -- "No" --> Native["Do nothing; native paste continues"]
-    Clip -- "Yes" --> Temp["Save temp PNG"]
-    Temp --> Mkdir["ssh mkdir -p remote_dir"]
-    Mkdir --> Scp["scp image to server"]
-    Scp --> Path["Render template"]
-    Path --> Paste["Set clipboard to path and send Shift+Insert"]
-    Paste --> SSH
-```
+![ipssh architecture](docs/assets/architecture.svg)
 
 ## Requirements
 

@@ -28,21 +28,7 @@ The current architecture avoids a custom terminal bridge. `ssh.exe` is launched 
 
 `ipssh` adds a sidecar worker thread. The worker installs a low-level Windows keyboard hook for the configured hotkey. The hook observes keydown events and sends a notification to the worker; it does not consume or rewrite keyboard input. The worker then checks the clipboard. Only image clipboard content is handled by `ipssh`. The worker keeps a one-entry in-memory cache for the last uploaded clipboard image and rendered remote path.
 
-```mermaid
-flowchart TB
-    CLI["CLI and config loader"] --> Session["run ssh.exe as normal child process"]
-    Session <--> Console["Windows Terminal / console"]
-    Session <--> Server["Remote SSH server"]
-
-    CLI --> Worker["Image hotkey worker"]
-    Worker --> Hook["Low-level keyboard hook"]
-    Worker --> Clipboard["Windows clipboard"]
-    Worker --> Uploader["OpenSSH uploader"]
-    Uploader --> Mkdir["ssh mkdir -p"]
-    Uploader --> Scp["scp local PNG to remote path"]
-    Worker --> Inserter["Clipboard path inserter"]
-    Inserter --> Console
-```
+![ipssh architecture](assets/architecture.svg)
 
 ## Module Responsibilities
 
