@@ -43,9 +43,12 @@
   <text class="title" x="78" y="78">ipssh architecture</text>
   <text class="subtitle" x="78" y="108">ipssh wraps native OpenSSH tools: ssh.exe owns the terminal session, scp.exe uploads images.</text>
 
-  <rect class="blue" x="72" y="206" width="198" height="82" rx="12"/>
-  <text class="label" x="171" y="240">User</text>
-  <text class="small" x="171" y="264">Windows Terminal</text>
+  <rect class="blue" x="72" y="176" width="198" height="64" rx="12"/>
+  <text class="label" x="171" y="213">User</text>
+
+  <rect class="blue" x="72" y="286" width="198" height="72" rx="12"/>
+  <text class="label" x="171" y="318">Windows Terminal</text>
+  <text class="small" x="171" y="340">native paste target</text>
 
   <rect class="container" x="318" y="138" width="620" height="538" rx="20"/>
   <text class="sectionTitle" x="348" y="174">ipssh process</text>
@@ -86,7 +89,7 @@
 
   <rect class="amber" x="488" y="590" width="210" height="42" rx="10"/>
   <text class="small" x="593" y="608">non-image paste</text>
-  <text class="tiny" x="593" y="624">left to Windows Terminal</text>
+  <text class="tiny" x="593" y="624">handled by terminal</text>
 
   <rect class="tools" x="986" y="138" width="226" height="538" rx="20"/>
   <text class="sectionTitle" x="1016" y="174">native OpenSSH tools</text>
@@ -107,12 +110,14 @@
   <text class="label" x="1101" y="378">SSH server</text>
   <text class="small" x="1101" y="400">remote shell</text>
 
-  <rect class="note" x="946" y="690" width="256" height="44" rx="10"/>
-  <text class="tiny" x="1074" y="709">Yes: reuse cached remote path</text>
-  <text class="tiny" x="1074" y="725">and paste it without scp.exe</text>
+  <rect class="note" x="946" y="682" width="256" height="44" rx="10"/>
+  <text class="tiny" x="1074" y="701">Yes: reuse cached remote path</text>
+  <text class="tiny" x="1074" y="717">and paste it without scp.exe</text>
 
-  <path class="darkLine" d="M 270 247 L 318 247"/>
-  <text class="tiny" x="294" y="232">runs</text>
+  <path class="darkLine" d="M 171 240 L 171 286"/>
+  <text class="tiny" x="204" y="266">keyboard</text>
+  <path class="darkLine" d="M 270 322 L 318 322"/>
+  <text class="tiny" x="294" y="306">runs ipssh</text>
 
   <path class="darkLine" d="M 600 323 L 986 271"/>
   <path class="darkLine" d="M 1101 310 L 1101 346"/>
@@ -123,8 +128,9 @@
   <path class="greenLine" d="M 819 566 L 819 570"/>
   <path class="greenLine" d="M 884 604 C 928 570, 966 532, 1026 519"/>
   <text class="tiny" x="952" y="554">No: upload</text>
-  <path class="greenLine" d="M 819 638 C 850 700, 894 712, 946 712"/>
-  <text class="tiny" x="890" y="692">Yes</text>
+  <path class="greenLine" d="M 819 638 C 850 688, 894 704, 946 704"/>
+  <text class="tiny" x="890" y="684">Yes</text>
   <path class="greenLine" d="M 1101 480 L 1101 420"/>
-  <path class="mutedLine" d="M 643 566 L 643 590"/>
+  <path class="mutedLine" d="M 488 612 C 350 612, 210 466, 171 358"/>
+  <text class="tiny" x="318" y="548">native paste</text>
 </svg>
