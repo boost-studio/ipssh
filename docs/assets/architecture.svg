@@ -20,6 +20,7 @@
       .green { fill: #ecfdf3; stroke: #12b76a; stroke-width: 1.7; }
       .amber { fill: #fff8e8; stroke: #f79009; stroke-width: 1.6; }
       .note { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.1; }
+      .decision { fill: #f0fdf9; stroke: #0d9488; stroke-width: 1.6; }
       .badge { fill: #344054; }
       .title { fill: #101828; font: 700 28px "Segoe UI", Arial, sans-serif; }
       .subtitle { fill: #475467; font: 400 16px "Segoe UI", Arial, sans-serif; }
@@ -85,9 +86,13 @@
   <text class="small" x="679" y="604">non-image paste</text>
   <text class="tiny" x="679" y="620">left to Windows Terminal</text>
 
-  <rect class="green" x="1084" y="512" width="148" height="78" rx="11"/>
-  <text class="label" x="1158" y="544">scp PNG</text>
-  <text class="tiny" x="1158" y="566">mkdir if needed</text>
+  <path class="decision" d="M 1110 468 L 1158 424 L 1206 468 L 1158 512 Z"/>
+  <text class="tiny" x="1158" y="463">same</text>
+  <text class="tiny" x="1158" y="479">image?</text>
+
+  <rect class="green" x="1084" y="548" width="148" height="70" rx="11"/>
+  <text class="label" x="1158" y="578">scp PNG</text>
+  <text class="tiny" x="1158" y="599">mkdir if needed</text>
 
   <rect class="blue" x="1084" y="232" width="148" height="84" rx="11"/>
   <text class="label" x="1158" y="265">SSH server</text>
@@ -106,8 +111,13 @@
 
   <path class="greenLine" d="M 572 533 L 618 533"/>
   <path class="greenLine" d="M 784 533 L 828 533"/>
-  <path class="greenLine" d="M 970 533 C 1016 536, 1038 548, 1084 551"/>
-  <path class="greenLine" d="M 1158 512 L 1158 404"/>
+  <path class="greenLine" d="M 970 533 C 1010 518, 1050 492, 1110 468"/>
+  <text class="tiny" x="1030" y="500">compare</text>
+  <path class="greenLine" d="M 1158 512 L 1158 548"/>
+  <text class="tiny" x="1178" y="534">No</text>
+  <path class="greenLine" d="M 1206 468 C 1224 448, 1224 410, 1250 380"/>
+  <path class="greenLine" d="M 1158 548 L 1158 404"/>
+  <text class="tiny" x="1228" y="444">Yes: reuse path</text>
   <path class="greenLine" d="M 1158 356 L 1158 316"/>
   <path class="mutedLine" d="M 701 568 L 701 586"/>
 </svg>
