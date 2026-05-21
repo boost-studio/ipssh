@@ -78,11 +78,22 @@ jobs:
         shell: pwsh
         run: powershell -ExecutionPolicy Bypass -File packaging\windows\build-installer.ps1
 
+      - name: Resolve installer path
+        id: installer-path
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $assetPath = "dist/ipssh-$version-windows-x64-installer.exe"
+          if (-not (Test-Path $assetPath)) {
+            Write-Error "Installer not found: $assetPath"
+          }
+          "asset_path=$assetPath" >> $env:GITHUB_OUTPUT
+
       - name: Upload installer
         uses: actions/upload-artifact@v5
         with:
           name: ipssh-${{ github.ref_name }}-windows-x64-installer
-          path: dist/ipssh-0.1.1-windows-x64-installer.exe
+          path: ${{ steps.installer-path.outputs.asset_path }}
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -91,7 +102,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "${{ github.ref_name }}"
-          $assetPath = "dist\ipssh-0.1.1-windows-x64-installer.exe"
+          $assetPath = "${{ steps.installer-path.outputs.asset_path }}"
 
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
