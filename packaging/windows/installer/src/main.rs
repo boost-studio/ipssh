@@ -11,9 +11,18 @@ const EXE_BYTES: &[u8] = include_bytes!(env!("IPSSH_BIN"));
 const DEFAULT_CONFIG: &str = include_str!("../../default-config.toml");
 
 fn main() {
-    if let Err(error) = run() {
+    let pause_before_exit = should_pause_after_run(current_console_process_count());
+    let result = run();
+    if let Err(error) = result {
         eprintln!("ipssh installer failed: {error}");
+        if pause_before_exit {
+            wait_for_enter();
+        }
         std::process::exit(1);
+    }
+
+    if pause_before_exit {
+        wait_for_enter();
     }
 }
 
@@ -45,6 +54,38 @@ fn print_help() {
     println!("  ipssh-installer.exe --no-path    Install without modifying user PATH");
     println!("  ipssh-installer.exe --uninstall  Remove the installed files and PATH entry");
     println!("  ipssh-installer.exe --help       Show this help");
+}
+
+fn should_pause_after_run(console_process_count: Option<u32>) -> bool {
+    matches!(console_process_count, Some(0 | 1))
+}
+
+#[cfg(windows)]
+fn current_console_process_count() -> Option<u32> {
+    extern "system" {
+        fn GetConsoleProcessList(process_list: *mut u32, process_count: u32) -> u32;
+    }
+
+    let mut process_ids = [0_u32; 16];
+    let count =
+        unsafe { GetConsoleProcessList(process_ids.as_mut_ptr(), process_ids.len() as u32) };
+    if count == 0 {
+        None
+    } else {
+        Some(count)
+    }
+}
+
+#[cfg(not(windows))]
+fn current_console_process_count() -> Option<u32> {
+    None
+}
+
+fn wait_for_enter() {
+    eprintln!();
+    eprintln!("Press Enter to close this window...");
+    let mut line = String::new();
+    let _ = io::stdin().read_line(&mut line);
 }
 
 fn install(install_dir: &Path, update_path: bool) -> io::Result<()> {
@@ -94,7 +135,9 @@ fn install_dir() -> io::Result<PathBuf> {
             "LOCALAPPDATA is not set; cannot choose a per-user install directory",
         )
     })?;
-    Ok(PathBuf::from(local_app_data).join("Programs").join(APP_NAME))
+    Ok(PathBuf::from(local_app_data)
+        .join("Programs")
+        .join(APP_NAME))
 }
 
 fn install_default_config() -> io::Result<PathBuf> {
@@ -256,5 +299,20 @@ mod tests {
             "remote_dir = \"~/custom\""
         );
         let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn pauses_when_installer_owns_the_console() {
+        assert!(should_pause_after_run(Some(1)));
+    }
+
+    #[test]
+    fn does_not_pause_when_launched_from_an_existing_terminal() {
+        assert!(!should_pause_after_run(Some(2)));
+    }
+
+    #[test]
+    fn does_not_pause_when_console_process_count_is_unavailable() {
+        assert!(!should_pause_after_run(None));
     }
 }
