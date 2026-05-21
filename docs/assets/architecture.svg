@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
   <title id="title">ipssh architecture</title>
-  <desc id="desc">OpenSSH owns the interactive terminal. ipssh only handles clipboard image paste events.</desc>
+  <desc id="desc">The user runs ipssh. ipssh launches ssh.exe and runs a sidecar that uploads clipboard images.</desc>
   <defs>
     <marker id="arrowDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#344054"/>
@@ -14,6 +14,7 @@
     <style>
       .bg { fill: #f7f8fb; }
       .panel { fill: #ffffff; stroke: #d0d5dd; stroke-width: 1.4; filter: url(#shadow); }
+      .container { fill: #f8fafc; stroke: #64748b; stroke-width: 1.8; }
       .band { fill: #eef2f6; stroke: #cbd5e1; stroke-width: 1.2; }
       .blue { fill: #eff8ff; stroke: #2e90fa; stroke-width: 1.7; }
       .green { fill: #ecfdf3; stroke: #12b76a; stroke-width: 1.7; }
@@ -22,10 +23,11 @@
       .badge { fill: #344054; }
       .title { fill: #101828; font: 700 28px "Segoe UI", Arial, sans-serif; }
       .subtitle { fill: #475467; font: 400 16px "Segoe UI", Arial, sans-serif; }
-      .label { fill: #101828; font: 700 17px "Segoe UI", Arial, sans-serif; }
-      .small { fill: #475467; font: 400 14px "Segoe UI", Arial, sans-serif; }
-      .tiny { fill: #667085; font: 400 12px "Segoe UI", Arial, sans-serif; }
-      .badgeText { fill: #ffffff; font: 700 12px "Segoe UI", Arial, sans-serif; letter-spacing: .4px; }
+      .sectionTitle { fill: #101828; font: 700 18px "Segoe UI", Arial, sans-serif; }
+      .label { fill: #101828; font: 700 17px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .small { fill: #475467; font: 400 14px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .tiny { fill: #667085; font: 400 12px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
+      .badgeText { fill: #ffffff; font: 700 12px "Segoe UI", Arial, sans-serif; letter-spacing: .4px; text-anchor: middle; }
       .darkLine { fill: none; stroke: #344054; stroke-width: 2.3; marker-end: url(#arrowDark); }
       .darkReturn { fill: none; stroke: #98a2b3; stroke-width: 1.9; stroke-dasharray: 7 7; marker-end: url(#arrowDark); }
       .greenLine { fill: none; stroke: #08745F; stroke-width: 2.5; marker-end: url(#arrowGreen); }
@@ -34,77 +36,82 @@
     </style>
   </defs>
 
-  <rect class="bg" width="1280" height="720"/>
-  <rect class="panel" x="38" y="32" width="1204" height="650" rx="18"/>
+  <rect class="bg" width="1280" height="760"/>
+  <rect class="panel" x="36" y="30" width="1208" height="700" rx="18"/>
 
-  <text class="title" x="82" y="82">ipssh architecture</text>
-  <text class="subtitle" x="82" y="112">OpenSSH keeps terminal behavior native. ipssh only handles clipboard images and pastes the uploaded remote path.</text>
+  <text class="title" x="78" y="78">ipssh architecture</text>
+  <text class="subtitle" x="78" y="108">The user runs ipssh. ipssh launches OpenSSH for the terminal session and handles only clipboard image paste events.</text>
 
-  <rect class="band" x="78" y="150" width="1124" height="190" rx="16"/>
-  <rect class="badge" x="104" y="174" width="120" height="30" rx="15"/>
-  <text class="badgeText" x="124" y="194">native SSH</text>
+  <rect class="blue" x="78" y="206" width="205" height="82" rx="12"/>
+  <text class="label" x="180.5" y="240">User</text>
+  <text class="small" x="180.5" y="264">Windows Terminal</text>
 
-  <rect class="blue" x="112" y="234" width="205" height="72" rx="11"/>
-  <text class="label" x="178" y="265">User</text>
-  <text class="small" x="157" y="288">Windows Terminal</text>
+  <rect class="container" x="336" y="138" width="704" height="538" rx="20"/>
+  <text class="sectionTitle" x="366" y="174">ipssh process</text>
+  <text class="subtitle" x="366" y="198">wraps OpenSSH instead of implementing SSH</text>
 
-  <rect class="blue" x="432" y="224" width="230" height="92" rx="11"/>
-  <text class="label" x="495" y="260">ssh.exe</text>
-  <text class="small" x="482" y="285">owns stdin</text>
-  <text class="small" x="480" y="303">and stdout</text>
+  <rect class="band" x="370" y="222" width="636" height="154" rx="16"/>
+  <rect class="badge" x="392" y="244" width="142" height="30" rx="15"/>
+  <text class="badgeText" x="463" y="264">native SSH</text>
 
-  <rect class="blue" x="888" y="224" width="230" height="92" rx="11"/>
-  <text class="label" x="954" y="260">SSH server</text>
-  <text class="small" x="942" y="285">remote shell</text>
-  <text class="small" x="956" y="303">and tools</text>
+  <rect class="blue" x="418" y="296" width="210" height="58" rx="11"/>
+  <text class="label" x="523" y="321">launches</text>
+  <text class="small" x="523" y="342">ssh.exe</text>
 
-  <rect class="note" x="492" y="164" width="350" height="44" rx="10"/>
-  <text class="tiny" x="520" y="184">Normal terminal behavior stays native:</text>
-  <text class="tiny" x="520" y="200">text paste, multiline paste, Ctrl+C, Ctrl+D</text>
+  <rect class="blue" x="754" y="286" width="210" height="78" rx="11"/>
+  <text class="label" x="859" y="318">ssh.exe</text>
+  <text class="small" x="859" y="342">owns terminal I/O</text>
 
-  <path class="darkLine" d="M 317 270 L 432 270"/>
-  <path class="darkLine" d="M 662 270 L 888 270"/>
-  <path class="darkReturn" d="M 888 301 C 810 344, 742 344, 662 301"/>
+  <rect class="note" x="520" y="232" width="350" height="44" rx="10"/>
+  <text class="tiny" x="695" y="252">Native terminal behavior stays intact</text>
+  <text class="tiny" x="695" y="268">text paste, Ctrl+C, Ctrl+D, full-screen apps</text>
 
-  <rect class="band" x="78" y="382" width="1124" height="246" rx="16"/>
-  <rect class="badge" x="104" y="406" width="150" height="30" rx="15"/>
-  <text class="badgeText" x="125" y="426">image sidecar</text>
+  <rect class="band" x="370" y="416" width="636" height="222" rx="16"/>
+  <rect class="badge" x="392" y="438" width="150" height="30" rx="15"/>
+  <text class="badgeText" x="467" y="458">image sidecar</text>
 
-  <rect class="green" x="112" y="466" width="210" height="82" rx="11"/>
-  <text class="label" x="189" y="500">Alt+V</text>
-  <text class="small" x="157" y="525">hotkey hook</text>
+  <rect class="green" x="408" y="498" width="164" height="70" rx="11"/>
+  <text class="label" x="490" y="526">Alt+V</text>
+  <text class="small" x="490" y="548">hotkey hook</text>
 
-  <rect class="green" x="388" y="466" width="215" height="82" rx="11"/>
-  <text class="label" x="452" y="500">Clipboard</text>
-  <text class="small" x="460" y="525">image only</text>
+  <rect class="green" x="618" y="498" width="166" height="70" rx="11"/>
+  <text class="label" x="701" y="526">Clipboard</text>
+  <text class="small" x="701" y="548">image only</text>
 
-  <rect class="green" x="670" y="466" width="225" height="82" rx="11"/>
-  <text class="label" x="722" y="500">Upload worker</text>
-  <text class="small" x="722" y="525">cache last image</text>
+  <rect class="green" x="828" y="498" width="142" height="70" rx="11"/>
+  <text class="label" x="899" y="526">Upload</text>
+  <text class="small" x="899" y="548">cache last</text>
 
-  <rect class="green" x="966" y="430" width="205" height="66" rx="11"/>
-  <text class="label" x="1022" y="469">ssh mkdir</text>
+  <rect class="amber" x="554" y="586" width="250" height="34" rx="10"/>
+  <text class="small" x="679" y="608">non-image paste passes through</text>
 
-  <rect class="green" x="966" y="542" width="205" height="66" rx="11"/>
-  <text class="label" x="1028" y="581">scp PNG</text>
+  <rect class="green" x="1084" y="464" width="148" height="58" rx="11"/>
+  <text class="label" x="1158" y="499">ssh mkdir</text>
 
-  <rect class="amber" x="392" y="578" width="260" height="34" rx="10"/>
-  <text class="small" x="430" y="600">non-image paste passes through</text>
+  <rect class="green" x="1084" y="560" width="148" height="58" rx="11"/>
+  <text class="label" x="1158" y="595">scp PNG</text>
 
-  <rect class="note" x="576" y="638" width="430" height="44" rx="10"/>
-  <text class="tiny" x="604" y="658">To insert the path: set clipboard text, send Shift+Insert,</text>
-  <text class="tiny" x="604" y="674">then restore the previous clipboard content where possible.</text>
+  <rect class="blue" x="1084" y="232" width="148" height="84" rx="11"/>
+  <text class="label" x="1158" y="265">SSH server</text>
+  <text class="small" x="1158" y="289">remote shell</text>
 
-  <rect class="note" x="1014" y="340" width="170" height="42" rx="10"/>
-  <text class="tiny" x="1040" y="358">Rendered remote</text>
-  <text class="tiny" x="1058" y="374">file path</text>
+  <rect class="note" x="1060" y="356" width="196" height="48" rx="10"/>
+  <text class="tiny" x="1158" y="376">rendered remote path</text>
+  <text class="tiny" x="1158" y="392">pasted via Shift+Insert</text>
 
-  <path class="greenLine" d="M 322 507 L 388 507"/>
-  <path class="greenLine" d="M 603 507 L 670 507"/>
-  <path class="greenLine" d="M 895 492 C 925 480, 938 467, 966 463"/>
-  <path class="greenLine" d="M 895 523 C 926 538, 938 562, 966 575"/>
-  <path class="greenLine" d="M 1068 430 L 1068 382"/>
-  <path class="greenLine" d="M 1068 340 L 1068 316"/>
-  <path class="greenReturn" d="M 670 546 C 560 632, 330 632, 217 548"/>
-  <path class="mutedLine" d="M 496 548 L 496 578"/>
+  <path class="darkLine" d="M 283 247 L 336 247"/>
+  <text class="tiny" x="309" y="232">runs</text>
+
+  <path class="darkLine" d="M 628 325 L 754 325"/>
+  <path class="darkLine" d="M 964 325 C 1004 315, 1037 292, 1084 276"/>
+  <path class="darkReturn" d="M 1084 305 C 1010 382, 1004 383, 964 352"/>
+
+  <path class="greenLine" d="M 572 533 L 618 533"/>
+  <path class="greenLine" d="M 784 533 L 828 533"/>
+  <path class="greenLine" d="M 970 518 C 1017 503, 1038 493, 1084 493"/>
+  <path class="greenLine" d="M 970 548 C 1018 566, 1038 589, 1084 589"/>
+  <path class="greenLine" d="M 1158 464 L 1158 404"/>
+  <path class="greenLine" d="M 1158 356 L 1158 316"/>
+  <path class="greenReturn" d="M 554 620 C 432 672, 296 642, 222 288"/>
+  <path class="mutedLine" d="M 701 568 L 701 586"/>
 </svg>
