@@ -2,13 +2,13 @@
   <title id="title">ipssh architecture</title>
   <desc id="desc">ipssh runs inside Windows Terminal, calls native ssh.exe and scp.exe, and connects to a remote SSH server.</desc>
   <defs>
-    <marker id="arrowDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrowDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
     </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#047857"/>
     </marker>
-    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
     </marker>
     <filter id="shadow" x="-8%" y="-10%" width="116%" height="125%">
@@ -34,10 +34,10 @@
       .small { fill: #475569; font: 400 13px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
       .tiny { fill: #64748b; font: 400 11.5px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
       .badgeText { fill: #ffffff; font: 700 12px "Segoe UI", Arial, sans-serif; text-anchor: middle; }
-      .lineDark { fill: none; stroke: #334155; stroke-width: 2.1; marker-end: url(#arrowDark); }
-      .lineGreen { fill: none; stroke: #047857; stroke-width: 2.2; marker-end: url(#arrowGreen); }
-      .lineAmber { fill: none; stroke: #b45309; stroke-width: 1.9; stroke-dasharray: 6 6; marker-end: url(#arrowAmber); }
-      .lineMuted { fill: none; stroke: #94a3b8; stroke-width: 1.7; stroke-dasharray: 6 6; marker-end: url(#arrowDark); }
+      .lineDark { fill: none; stroke: #334155; stroke-width: 1.65; marker-end: url(#arrowDark); }
+      .lineGreen { fill: none; stroke: #047857; stroke-width: 1.75; marker-end: url(#arrowGreen); }
+      .lineAmber { fill: none; stroke: #b45309; stroke-width: 1.45; stroke-dasharray: 5 6; marker-end: url(#arrowAmber); }
+      .lineMuted { fill: none; stroke: #94a3b8; stroke-width: 1.35; stroke-dasharray: 5 6; marker-end: url(#arrowDark); }
     </style>
   </defs>
 
@@ -83,21 +83,21 @@
   <text class="tiny" x="606" y="511">clipboard</text>
   <text class="tiny" x="606" y="527">image?</text>
 
-  <rect class="nodeGreen" x="714" y="486" width="120" height="58" rx="10"/>
-  <text class="label" x="774" y="509">Cache</text>
-  <text class="small" x="774" y="529">last image</text>
+  <rect class="nodeGreen" x="684" y="486" width="120" height="58" rx="10"/>
+  <text class="label" x="744" y="509">Cache</text>
+  <text class="small" x="744" y="529">last image</text>
 
-  <path class="decision" d="M 716 594 L 774 562 L 832 594 L 774 626 Z"/>
-  <text class="tiny" x="774" y="590">same</text>
-  <text class="tiny" x="774" y="606">image?</text>
+  <path class="decision" d="M 686 594 L 744 562 L 802 594 L 744 626 Z"/>
+  <text class="tiny" x="744" y="590">same</text>
+  <text class="tiny" x="744" y="606">image?</text>
 
   <rect class="nodeAmber" x="504" y="578" width="174" height="42" rx="10"/>
   <text class="small" x="591" y="595">non-image paste</text>
   <text class="tiny" x="591" y="611">handled by terminal</text>
 
-  <rect class="nodeGreen" x="628" y="646" width="214" height="42" rx="10"/>
-  <text class="small" x="735" y="663">reuse cached remote path</text>
-  <text class="tiny" x="735" y="679">no duplicate scp upload</text>
+  <rect class="nodeGreen" x="584" y="646" width="228" height="42" rx="10"/>
+  <text class="small" x="698" y="663">reuse cached remote path</text>
+  <text class="tiny" x="698" y="679">no duplicate scp upload</text>
 
   <rect class="group" x="938" y="138" width="162" height="568" rx="18"/>
   <text class="sectionTitle" x="968" y="174">native tools</text>
@@ -131,18 +131,18 @@
   <text class="tiny" x="993" y="432">remote shell I/O</text>
 
   <path class="lineGreen" d="M 484 515 L 548 515"/>
-  <path class="lineGreen" d="M 664 515 L 714 515"/>
-  <text class="tiny" x="690" y="498">Yes</text>
+  <path class="lineGreen" d="M 664 515 L 684 515"/>
+  <text class="tiny" x="674" y="498">Yes</text>
   <path class="lineAmber" d="M 578 540 L 578 578"/>
   <text class="tiny" x="558" y="562">No</text>
   <path class="lineAmber" d="M 504 599 C 370 598, 262 466, 170 374"/>
 
-  <path class="lineGreen" d="M 774 544 L 774 562"/>
-  <path class="lineGreen" d="M 832 594 C 880 594, 906 546, 962 543"/>
-  <text class="tiny" x="906" y="568">No: upload</text>
-  <path class="lineGreen" d="M 774 626 C 774 640, 756 642, 742 646"/>
-  <text class="tiny" x="798" y="642">Yes</text>
+  <path class="lineGreen" d="M 744 544 L 744 562"/>
+  <path class="lineGreen" d="M 802 594 C 852 594, 900 548, 962 543"/>
+  <text class="tiny" x="890" y="568">No: upload</text>
+  <path class="lineGreen" d="M 744 626 C 738 640, 718 642, 698 646"/>
+  <text class="tiny" x="768" y="642">Yes</text>
   <path class="lineGreen" d="M 1076 543 C 1112 530, 1124 424, 1130 388"/>
-  <path class="lineGreen" d="M 1130 406 C 1040 650, 914 667, 842 667"/>
-  <text class="tiny" x="1036" y="652">remote file path</text>
+  <path class="lineGreen" d="M 1130 406 C 1044 646, 904 667, 812 667"/>
+  <text class="tiny" x="1018" y="652">remote file path</text>
 </svg>
