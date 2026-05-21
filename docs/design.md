@@ -28,7 +28,7 @@ The current architecture avoids a custom terminal bridge. `ssh.exe` is launched 
 
 `ipssh` adds a sidecar worker thread. The worker installs a low-level Windows keyboard hook for the configured hotkey. The hook observes keydown events and sends a notification to the worker; it does not consume or rewrite keyboard input. The worker then checks the clipboard. Only image clipboard content is handled by `ipssh`. The worker keeps a one-entry in-memory cache for the last uploaded clipboard image and rendered remote path.
 
-![ipssh architecture](assets/architecture.svg)
+![ipssh architecture](assets/architecture.png)
 
 ## Module Responsibilities
 

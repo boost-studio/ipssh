@@ -16,7 +16,7 @@ For design details, see [docs/design.md](docs/design.md).
 
 In parallel, a background worker installs a low-level Windows keyboard hook for the configured hotkey. When that hotkey is pressed, the worker checks the clipboard. If the clipboard contains an image, it uploads the image through OpenSSH tools and temporarily places the generated remote path on the clipboard, then simulates `Shift+Insert` to paste the path into the SSH session. If the same clipboard image is pasted again in the same `ipssh` session, the previous remote path is reused without uploading again. If the clipboard is not an image, `ipssh` does nothing and the terminal handles the paste normally.
 
-![ipssh architecture](docs/assets/architecture.svg)
+![ipssh architecture](docs/assets/architecture.png)
 
 ## Requirements
 
